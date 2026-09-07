@@ -1983,8 +1983,44 @@ function switchPage(page) {
   stopSpeak();
 }
 
+// ==================== AUTO MIGRATION ====================
+function checkUrlMigration() {
+  var params = new URLSearchParams(window.location.search);
+  var migrateData = params.get('migrate');
+  if (!migrateData) return;
+  try {
+    var decoded = decodeURIComponent(escape(atob(migrateData)));
+    var parsed = JSON.parse(decoded);
+    if (!parsed.tasks || typeof parsed.tasks !== 'object') { throw new Error('invalid'); }
+    Object.keys(parsed).forEach(function(key) {
+      if (key === 'vocabProgress' || key === 'tasks' || key === 'checkIns' || key === 'vocabToday' || key === 'listeningDone' || key === 'clozeDone' || key === 'textbookRead') {
+        if (!data[key]) data[key] = {};
+        Object.keys(parsed[key]).forEach(function(k) { data[key][k] = parsed[key][k]; });
+      } else if (key === 'errorBook' || key === 'mockScores' || key === 'clozeHistory' || key === 'fetchedWords') {
+        if (!Array.isArray(data[key])) data[key] = [];
+        parsed[key].forEach(function(item) {
+          if (!data[key].some(function(x) { return JSON.stringify(x) === JSON.stringify(item); })) data[key].push(item);
+        });
+      } else {
+        if (data[key] === undefined || data[key] === null || data[key] === '' || (typeof data[key] === 'number' && data[key] === 0)) data[key] = parsed[key];
+        else if (typeof parsed[key] === 'number' && parsed[key] > (data[key] || 0)) data[key] = parsed[key];
+      }
+    });
+    saveData();
+    renderToday(); renderStats(); renderErrorBook();
+    showToast('✅ 旧站数据已成功导入！');
+    setTimeout(function() {
+      var url = window.location.pathname;
+      window.history.replaceState({}, '', url);
+    }, 500);
+  } catch(e) {
+    showToast('数据导入失败');
+  }
+}
+
 // ==================== INIT ====================
 setInterval(checkReminder, 60000);
+checkUrlMigration();
 renderToday();
 renderVocab();
 renderListeningList();
