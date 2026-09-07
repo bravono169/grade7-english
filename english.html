@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="英语训练">
+<meta name="application-name" content="英语训练">
+<meta name="theme-color" content="#7C5BAC">
+<meta name="format-detection" content="telephone=no">
+<title>英语每日训练</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Crect width='180' height='180' rx='40' fill='%237C5BAC'/%3E%3Ctext x='90' y='115' font-size='70' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3EEN%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Crect width='192' height='192' rx='40' fill='%237C5BAC'/%3E%3Ctext x='96' y='125' font-size='80' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3EEN%3C/text%3E%3C/svg%3E">
+<style>
+:root {
+  --bg: #FDFAF6; --bg2: #FFF6EE; --ink: #2C2520; --muted: #8C7E72;
+  --rule: #E8DDD3; --en: #7C5BAC; --en-light: rgba(124,91,172,0.1);
+  --en-dark: #5C3F8C; --accent: #C6533D; --accent2: #E8A335;
+  --green: #2D7A6B; --green-light: rgba(45,122,107,0.1);
+  --white: #FFFFFF; --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --radius: 14px; --nav-h: 56px; --safe-bottom: env(safe-area-inset-bottom,0px); --safe-top: env(safe-area-inset-top,0px);
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body { font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif; font-size:14px; line-height:1.6; color:var(--ink); background:var(--bg); max-width:480px; margin:0 auto; min-height:100vh; position:relative; overflow-x:hidden; }
+.page { display:none; padding:calc(1rem + var(--safe-top)) 1rem calc(var(--nav-h) + var(--safe-bottom) + 1rem); min-height:100vh; animation:fadeIn 0.3s ease; }
+.page.active { display:block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+.top-bar { display:flex; align-items:center; justify-content:space-between; padding:1rem 0.25rem 0.75rem; }
+.top-bar .date-block .weekday { font-size:1.3rem; font-weight:800; }
+.top-bar .date-block .date { font-size:0.75rem; color:var(--muted); }
+.streak-badge { display:flex; align-items:center; gap:0.3rem; background:linear-gradient(135deg,#FF6B35,#FFA500); color:white; padding:0.3rem 0.7rem; border-radius:20px; font-size:0.8rem; font-weight:700; box-shadow:0 2px 8px rgba(255,107,53,0.3); }
+
+.reminder-banner { background:linear-gradient(135deg,var(--accent2),#F5C441); color:#5C3A00; border-radius:var(--radius); padding:0.75rem 1rem; margin-bottom:0.75rem; display:flex; align-items:center; gap:0.6rem; font-size:0.82rem; font-weight:600; cursor:pointer; }
+
+.check-in-area { background:var(--white); border-radius:var(--radius); padding:1rem; margin-bottom:0.75rem; box-shadow:var(--shadow); display:flex; align-items:center; justify-content:space-between; }
+.check-in-btn { background:linear-gradient(135deg,var(--green),#4A9D8A); color:white; border:none; border-radius:12px; padding:0.6rem 1.5rem; font-size:0.9rem; font-weight:700; cursor:pointer; font-family:inherit; transition:all 0.2s; }
+.check-in-btn:active { transform:scale(0.95); }
+.check-in-btn.done { background:var(--rule); color:var(--muted); }
+
+.progress-section { background:var(--white); border-radius:var(--radius); padding:1.25rem; margin-bottom:1rem; box-shadow:var(--shadow); display:flex; align-items:center; gap:1.25rem; }
+.progress-ring { position:relative; width:72px; height:72px; flex-shrink:0; }
+.progress-ring svg { transform:rotate(-90deg); }
+.progress-ring .ring-bg { fill:none; stroke:var(--rule); stroke-width:6; }
+.progress-ring .ring-fg { fill:none; stroke:var(--en); stroke-width:6; stroke-linecap:round; transition:stroke-dashoffset 0.5s ease; }
+.progress-ring .ring-text { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:1.1rem; font-weight:800; }
+
+.task-card { background:var(--white); border-radius:var(--radius); padding:0.85rem 1rem; margin-bottom:0.6rem; box-shadow:var(--shadow); display:flex; align-items:flex-start; gap:0.75rem; cursor:pointer; transition:all 0.2s; border:1.5px solid transparent; position:relative; overflow:hidden; }
+.task-card.done { opacity:0.55; }
+.task-card.done .task-name { text-decoration:line-through; }
+.task-card.en { border-left:3px solid var(--en); }
+.task-card:active { transform:scale(0.98); }
+.task-check { width:24px; height:24px; border:2px solid var(--rule); border-radius:50%; flex-shrink:0; margin-top:2px; display:flex; align-items:center; justify-content:center; transition:all 0.2s; font-size:0.7rem; color:transparent; }
+.task-card.en.done .task-check { background:var(--en); border-color:var(--en); color:white; }
+.task-card.en.done .task-check::after { content:'\2713'; color:white; font-weight:700; }
+.task-body { flex:1; min-width:0; }
+.task-name { font-size:0.92rem; font-weight:700; margin-bottom:0.15rem; }
+.task-detail { font-size:0.75rem; color:var(--muted); line-height:1.45; }
+.task-time { font-size:0.72rem; font-weight:700; padding:0.15rem 0.45rem; border-radius:6px; flex-shrink:0; margin-top:2px; background:var(--en-light); color:var(--en); }
+.task-action { font-size:0.72rem; font-weight:700; padding:0.2rem 0.6rem; border-radius:6px; background:var(--en); color:white; border:none; cursor:pointer; font-family:inherit; flex-shrink:0; margin-top:2px; }
+
+.section-label { font-size:0.82rem; font-weight:700; color:var(--muted); margin:0.5rem 0.25rem 0.6rem; display:flex; align-items:center; gap:0.4rem; }
+
+.vocab-counter { background:var(--white); border-radius:var(--radius); padding:0.85rem 1rem; margin-bottom:0.6rem; box-shadow:var(--shadow); display:flex; align-items:center; justify-content:space-between; }
+.vocab-counter .vc-label { font-size:0.85rem; font-weight:700; }
+.vocab-counter .vc-sub { font-size:0.72rem; color:var(--muted); }
+.vocab-counter .vc-controls { display:flex; align-items:center; gap:0.5rem; }
+.vocab-counter .vc-btn { width:32px; height:32px; border:none; border-radius:50%; background:var(--en-light); color:var(--en); font-size:1.1rem; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.vocab-counter .vc-btn:active { transform:scale(0.9); }
+.vocab-counter .vc-count { font-size:1.3rem; font-weight:800; color:var(--en); min-width:30px; text-align:center; }
+
+.fetch-btn { width:100%; background:linear-gradient(135deg,var(--en),#9B7BC8); color:white; border:none; border-radius:12px; padding:0.85rem; font-size:0.9rem; font-weight:700; cursor:pointer; font-family:inherit; margin-bottom:0.75rem; transition:all 0.2s; }
+.fetch-btn:active { transform:scale(0.97); }
+.fetch-btn:disabled { opacity:0.5; cursor:default; }
+
+.flashcard { width:100%; height:180px; perspective:600px; cursor:pointer; margin-bottom:0.75rem; }
+.flashcard-inner { position:relative; width:100%; height:100%; transition:transform 0.5s; transform-style:preserve-3d; }
+.flashcard.flipped .flashcard-inner { transform:rotateY(180deg); }
+.flashcard-front, .flashcard-back { position:absolute; width:100%; height:100%; backface-visibility:hidden; border-radius:var(--radius); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:1.5rem; }
+.flashcard-front { background:linear-gradient(135deg,var(--en),#9B7BC8); color:white; }
+.flashcard-back { background:linear-gradient(135deg,var(--en-dark),#7B5BA8); color:white; transform:rotateY(180deg); }
+.flashcard-front .word { font-size:1.6rem; font-weight:800; margin-bottom:0.5rem; }
+.flashcard-front .phonetic { font-size:0.8rem; opacity:0.8; margin-bottom:0.3rem; }
+.flashcard-front .hint { font-size:0.72rem; opacity:0.7; }
+.flashcard-back .meaning { font-size:1.2rem; font-weight:700; margin-bottom:0.5rem; }
+.flashcard-back .hint { font-size:0.72rem; opacity:0.7; margin-top:0.5rem; }
+.flashcard-empty { height:180px; border:2px dashed var(--rule); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:0.85rem; margin-bottom:0.75rem; text-align:center; }
+.flashcard-controls { display:flex; gap:0.6rem; justify-content:center; margin-bottom:0.75rem; }
+.flashcard-controls .btn { min-width:80px; }
+.btn-known { background:var(--green); color:white; }
+.btn-unknown { background:var(--accent); color:white; }
+.btn-speak { background:var(--en-light); color:var(--en); border:1.5px solid var(--en); }
+
+.vocab-list-item { display:flex; align-items:center; justify-content:space-between; padding:0.55rem 0.75rem; border-bottom:1px solid var(--rule); font-size:0.85rem; }
+.vocab-list-item:last-child { border-bottom:none; }
+.vocab-list-item .en-word { font-weight:700; cursor:pointer; }
+.vocab-list-item .en-word:active { color:var(--en); }
+.vocab-list-item .cn-word { color:var(--muted); font-size:0.8rem; }
+.vocab-list-item .stage-badge { font-size:0.65rem; padding:0.1rem 0.4rem; border-radius:4px; font-weight:700; }
+.vocab-list-item .speak-icon { font-size:0.9rem; opacity:0.5; cursor:pointer; margin-left:0.3rem; }
+.stage-0 { background:var(--rule); color:var(--muted); }
+.stage-1 { background:#FFE0B2; color:#E65100; }
+.stage-2 { background:#C8E6C9; color:#2E7D32; }
+.stage-3 { background:#B3E5FC; color:#0277BD; }
+.stage-4 { background:#D1C4E9; color:#512DA8; }
+.stage-5 { background:var(--green); color:white; }
+
+.btn { border:none; border-radius:8px; padding:0.55rem 1rem; font-size:0.85rem; font-weight:700; cursor:pointer; transition:all 0.2s; font-family:inherit; }
+.btn-primary { background:var(--en); color:white; }
+.btn-primary:active { transform:scale(0.95); }
+.btn-outline { background:transparent; border:1.5px solid var(--rule); color:var(--ink); }
+.btn-block { width:100%; }
+
+.exercise-card { background:var(--white); border-radius:var(--radius); padding:1rem; margin-bottom:0.6rem; box-shadow:var(--shadow); cursor:pointer; transition:all 0.2s; }
+.exercise-card:active { transform:scale(0.98); }
+.exercise-card .ex-title { font-size:0.9rem; font-weight:700; margin-bottom:0.2rem; }
+.exercise-card .ex-info { display:flex; align-items:center; gap:0.6rem; font-size:0.75rem; color:var(--muted); }
+.exercise-card .ex-tag { padding:0.1rem 0.4rem; border-radius:4px; font-size:0.68rem; font-weight:700; }
+.ex-tag-dialog { background:#E3F2FD; color:#1565C0; }
+.ex-tag-passage { background:#F3E5F5; color:#7B1FA2; }
+.ex-card-done { border-left:3px solid var(--green); }
+
+.player-area { background:var(--white); border-radius:var(--radius); padding:1.25rem; margin-bottom:0.75rem; box-shadow:var(--shadow); text-align:center; }
+.player-controls { display:flex; align-items:center; justify-content:center; gap:0.75rem; margin-bottom:0.75rem; }
+.player-btn { width:48px; height:48px; border:none; border-radius:50%; background:var(--en); color:white; font-size:1.3rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s; font-family:inherit; }
+.player-btn:active { transform:scale(0.9); }
+.player-btn.play { width:64px; height:64px; font-size:1.6rem; }
+.player-btn.sm { width:36px; height:36px; font-size:0.9rem; background:var(--en-light); color:var(--en); }
+.speed-control { display:flex; gap:0.4rem; justify-content:center; margin-bottom:0.5rem; }
+.speed-btn { border:1.5px solid var(--rule); background:var(--white); border-radius:6px; padding:0.2rem 0.6rem; font-size:0.75rem; font-weight:600; cursor:pointer; font-family:inherit; color:var(--muted); }
+.speed-btn.active { background:var(--en); color:white; border-color:var(--en); }
+.player-hint { font-size:0.78rem; color:var(--muted); }
+
+.question-block { background:var(--white); border-radius:var(--radius); padding:1rem; margin-bottom:0.6rem; box-shadow:var(--shadow); }
+.question-block .q-text { font-size:0.88rem; font-weight:600; margin-bottom:0.6rem; }
+.question-block .q-num { color:var(--en); font-weight:800; margin-right:0.3rem; }
+.option-row { display:flex; align-items:center; gap:0.5rem; padding:0.5rem 0.75rem; border:1.5px solid var(--rule); border-radius:8px; margin-bottom:0.4rem; cursor:pointer; transition:all 0.15s; font-size:0.85rem; }
+.option-row:active { transform:scale(0.98); }
+.option-row.selected { border-color:var(--en); background:var(--en-light); }
+.option-row.correct { border-color:var(--green); background:var(--green-light); }
+.option-row.wrong { border-color:var(--accent); background:rgba(198,83,61,0.08); }
+.option-letter { width:24px; height:24px; border:1.5px solid var(--rule); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.72rem; font-weight:700; flex-shrink:0; }
+.option-row.selected .option-letter { border-color:var(--en); background:var(--en); color:white; }
+.option-row.correct .option-letter { border-color:var(--green); background:var(--green); color:white; }
+.option-row.wrong .option-letter { border-color:var(--accent); background:var(--accent); color:white; }
+
+.cloze-passage { font-size:0.88rem; line-height:2; margin-bottom:0.75rem; }
+.cloze-blank { display:inline-block; min-width:60px; border-bottom:2px solid var(--en); margin:0 0.15rem; text-align:center; font-weight:700; color:var(--en); }
+.clickable-word { color:var(--en); text-decoration:underline; text-decoration-style:dotted; cursor:pointer; }
+.clickable-word:active { background:var(--en-light); border-radius:2px; }
+
+.score-display { text-align:center; padding:1.5rem; }
+.score-display .score-num { font-size:3rem; font-weight:800; color:var(--en); }
+.score-display .score-total { font-size:1rem; color:var(--muted); }
+.score-display .score-label { font-size:0.85rem; color:var(--muted); margin-top:0.5rem; }
+
+.stat-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1rem; }
+.stat-card { background:var(--white); border-radius:var(--radius); padding:1rem; box-shadow:var(--shadow); text-align:center; }
+.stat-card .num { font-size:2rem; font-weight:800; }
+.stat-card .num.en-color { color:var(--en); }
+.stat-card .num.accent-color { color:var(--accent); }
+.stat-card .num.green-color { color:var(--green); }
+.stat-card .label { font-size:0.75rem; color:var(--muted); margin-top:0.25rem; }
+
+.heatmap { background:var(--white); border-radius:var(--radius); padding:1rem; margin-bottom:1rem; box-shadow:var(--shadow); }
+.heatmap h4 { font-size:0.88rem; margin-bottom:0.75rem; }
+.heatmap-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+.heatmap-cell { aspect-ratio:1; border-radius:6px; background:var(--rule); display:flex; align-items:center; justify-content:center; font-size:0.65rem; color:var(--muted); }
+.heatmap-cell.has-data { background:var(--en-light); }
+.heatmap-cell.full { background:var(--en); color:white; }
+.heatmap-cell.today { box-shadow:0 0 0 2px var(--accent); }
+.heatmap-labels { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-bottom:6px; font-size:0.65rem; color:var(--muted); text-align:center; }
+
+.milestone-card { background:var(--white); border-radius:var(--radius); padding:1rem; margin-bottom:1rem; box-shadow:var(--shadow); }
+.milestone-card h4 { font-size:0.88rem; margin-bottom:0.75rem; }
+.milestone-bar { height:8px; background:var(--rule); border-radius:4px; overflow:hidden; margin-bottom:0.5rem; }
+.milestone-fill { height:100%; background:linear-gradient(90deg,var(--en),#9B7BC8); border-radius:4px; transition:width 0.5s ease; }
+
+.plan-collapse { background:var(--white); border-radius:var(--radius); margin-bottom:0.6rem; box-shadow:var(--shadow); overflow:hidden; }
+.plan-collapse-header { padding:0.85rem 1rem; display:flex; align-items:center; justify-content:space-between; cursor:pointer; font-size:0.9rem; font-weight:700; }
+.plan-collapse-body { display:none; padding:0 1rem 0.75rem; }
+.plan-collapse-body.open { display:block; }
+.plan-row { display:flex; padding:0.6rem 0; border-bottom:1px solid var(--rule); gap:0.6rem; }
+.plan-row:last-child { border-bottom:none; }
+.plan-row.today-row { background:var(--en-light); border-radius:8px; padding:0.6rem 0.75rem; }
+.plan-day { width:32px; font-weight:700; font-size:0.8rem; flex-shrink:0; text-align:center; padding-top:2px; color:var(--en); }
+.plan-tasks { flex:1; }
+.plan-task-item { font-size:0.74rem; color:var(--muted); padding:0.1rem 0; }
+
+.semester-switch { display:flex; background:var(--white); border-radius:10px; padding:3px; margin-bottom:0.75rem; box-shadow:var(--shadow); }
+.semester-switch button { flex:1; border:none; padding:0.5rem; border-radius:8px; font-size:0.82rem; font-weight:700; background:transparent; color:var(--muted); cursor:pointer; transition:all 0.2s; font-family:inherit; }
+.semester-switch button.active { background:var(--en); color:white; }
+
+.reminder-settings { background:var(--white); border-radius:var(--radius); padding:1rem; margin-bottom:0.75rem; box-shadow:var(--shadow); }
+.reminder-settings h4 { font-size:0.88rem; margin-bottom:0.6rem; }
+.reminder-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:0.5rem; }
+.reminder-row label { font-size:0.85rem; font-weight:600; }
+.reminder-row input[type="time"] { border:1.5px solid var(--rule); border-radius:8px; padding:0.3rem 0.5rem; font-size:0.85rem; outline:none; font-family:inherit; }
+.toggle-switch { position:relative; width:44px; height:24px; background:var(--rule); border-radius:12px; cursor:pointer; transition:background 0.2s; }
+.toggle-switch.on { background:var(--green); }
+.toggle-switch::after { content:''; position:absolute; top:2px; left:2px; width:20px; height:20px; background:white; border-radius:50%; transition:transform 0.2s; }
+.toggle-switch.on::after { transform:translateX(20px); }
+.notify-btn { background:var(--en-light); color:var(--en); border:1.5px solid var(--en); border-radius:8px; padding:0.4rem 0.75rem; font-size:0.78rem; font-weight:600; cursor:pointer; font-family:inherit; }
+
+.empty-state { text-align:center; padding:2rem 1rem; color:var(--muted); font-size:0.85rem; }
+
+.loading-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(253,250,246,0.95); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:300; transition:opacity 0.3s; }
+.loading-overlay.hidden { opacity:0; pointer-events:none; }
+.loading-spinner { width:48px; height:48px; border:4px solid var(--rule); border-top-color:var(--en); border-radius:50%; animation:spin 0.8s linear infinite; margin-bottom:1rem; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.loading-text { color:var(--muted); font-size:0.9rem; }
+.loading-sub { color:var(--muted); font-size:0.75rem; margin-top:0.3rem; }
+
+.bottom-nav { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; height:calc(var(--nav-h) + var(--safe-bottom)); background:var(--white); border-top:1px solid var(--rule); display:flex; padding-bottom:var(--safe-bottom); z-index:100; }
+.nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; cursor:pointer; transition:all 0.15s; color:var(--muted); font-size:0.62rem; }
+.nav-item.active { color:var(--en); }
+.nav-item .nav-icon { font-size:1.2rem; line-height:1; }
+.nav-item:active { transform:scale(0.9); }
+
+.toast { position:fixed; bottom:calc(var(--nav-h) + var(--safe-bottom) + 1rem); left:50%; transform:translateX(-50%) translateY(20px); background:rgba(44,37,32,0.9); color:white; padding:0.5rem 1.25rem; border-radius:20px; font-size:0.82rem; opacity:0; transition:all 0.3s; z-index:200; pointer-events:none; white-space:nowrap; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+.modal-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:250; opacity:0; pointer-events:none; transition:opacity 0.3s; }
+.modal-overlay.show { opacity:1; pointer-events:auto; }
+.modal { background:var(--white); border-radius:var(--radius); padding:1.5rem; max-width:340px; width:90%; text-align:center; transform:scale(0.9); transition:transform 0.3s; }
+.modal-overlay.show .modal { transform:scale(1); }
+.modal h3 { font-size:1.1rem; margin-bottom:0.75rem; }
+.modal p { font-size:0.85rem; color:var(--muted); margin-bottom:1rem; }
+.modal .btn { margin:0 0.3rem; }
+
+.textbook-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:var(--bg); z-index:260; display:none; overflow-y:auto; max-width:480px; margin:0 auto; padding-bottom:calc(var(--safe-bottom) + 1rem); }
+.textbook-overlay.show { display:block; }
+.textbook-header { position:sticky; top:0; background:var(--en); color:white; padding:calc(0.75rem + var(--safe-top)) 1rem 0.75rem; display:flex; align-items:center; justify-content:space-between; z-index:10; }
+.textbook-header .tb-title { font-size:0.95rem; font-weight:700; }
+.textbook-header .tb-close { background:rgba(255,255,255,0.25); border:none; color:white; border-radius:8px; padding:0.4rem 0.8rem; font-size:0.82rem; cursor:pointer; font-family:inherit; min-height:36px; min-width:60px; }
+.textbook-timer { background:var(--white); border-radius:var(--radius); padding:0.75rem 1rem; margin:0.75rem; box-shadow:var(--shadow); display:flex; align-items:center; justify-content:space-between; }
+.textbook-timer .tt-label { font-size:0.85rem; font-weight:700; }
+.textbook-timer .tt-count { font-size:1.5rem; font-weight:800; color:var(--en); }
+.textbook-timer .tt-bar { flex:1; height:6px; background:var(--rule); border-radius:3px; margin:0 0.75rem; overflow:hidden; }
+.textbook-timer .tt-bar-fill { height:100%; background:var(--en); border-radius:3px; transition:width 1s linear; }
+.textbook-content { background:var(--white); border-radius:var(--radius); padding:1.25rem; margin:0 0.75rem 1rem; box-shadow:var(--shadow); }
+.textbook-content h3 { font-size:1rem; color:var(--en); margin-bottom:0.5rem; }
+.textbook-content .tb-passage { font-size:0.88rem; line-height:2; margin-bottom:0.75rem; }
+.textbook-content .tb-vocab { border-top:1px solid var(--rule); padding-top:0.75rem; }
+.textbook-content .tb-vocab h4 { font-size:0.82rem; margin-bottom:0.4rem; }
+.textbook-content .tb-vocab-item { display:flex; justify-content:space-between; padding:0.2rem 0; font-size:0.8rem; }
+.textbook-content .tb-vocab-item .tb-en { font-weight:700; cursor:pointer; color:var(--en); }
+
+.word-popup { position:fixed; background:var(--white); border-radius:10px; padding:0.75rem 1rem; box-shadow:0 4px 20px rgba(0,0,0,0.15); z-index:280; max-width:280px; display:none; border:1.5px solid var(--en); }
+.word-popup.show { display:block; }
+.word-popup .wp-word { font-size:1.1rem; font-weight:800; color:var(--en); }
+.word-popup .wp-phonetic { font-size:0.78rem; color:var(--muted); margin:0.2rem 0; }
+.word-popup .wp-def { font-size:0.82rem; line-height:1.5; }
+.word-popup .wp-speak { background:var(--en-light); border:1px solid var(--en); border-radius:6px; padding:0.2rem 0.5rem; font-size:0.75rem; color:var(--en); cursor:pointer; font-family:inherit; margin-top:0.4rem; }
+
+.error-item { background:var(--white); border-radius:var(--radius); padding:0.85rem 1rem; margin-bottom:0.6rem; box-shadow:var(--shadow); border-left:3px solid var(--accent); }
+.error-item .ei-type { font-size:0.68rem; font-weight:700; padding:0.1rem 0.4rem; border-radius:4px; display:inline-block; margin-bottom:0.4rem; }
+.ei-type-listening { background:#E3F2FD; color:#1565C0; }
+.ei-type-cloze { background:#FFF3E0; color:#E65100; }
+.ei-type-mock { background:#FFEBEE; color:#C62828; }
+.ei-type-grammar { background:#F3E5F5; color:#7B1FA2; }
+.ei-type-vocab { background:#E8F5E9; color:#2E7D32; }
+.ei-type-reading { background:#FFF3E0; color:#E65100; }
+.error-item .ei-question { font-size:0.85rem; font-weight:600; margin-bottom:0.3rem; line-height:1.5; }
+.error-item .ei-answers { font-size:0.78rem; margin:0.3rem 0; }
+.error-item .ei-correct { color:var(--green); font-weight:600; }
+.error-item .ei-wrong { color:var(--accent); text-decoration:line-through; }
+.error-item .ei-explanation { font-size:0.78rem; color:var(--muted); background:var(--bg2); border-radius:6px; padding:0.4rem 0.6rem; margin-top:0.3rem; line-height:1.5; }
+.error-item .ei-date { font-size:0.7rem; color:var(--muted); margin-top:0.3rem; }
+.error-item .ei-del { font-size:0.7rem; color:var(--accent); cursor:pointer; margin-top:0.3rem; }
+
+.tab-switch { display:flex; background:var(--white); border-radius:10px; padding:3px; margin-bottom:0.75rem; box-shadow:var(--shadow); }
+.tab-switch button { flex:1; border:none; padding:0.5rem; border-radius:8px; font-size:0.82rem; font-weight:700; background:transparent; color:var(--muted); cursor:pointer; transition:all 0.2s; font-family:inherit; }
+.tab-switch button.active { background:var(--en); color:white; }
+
+.cloze-timer { background:var(--white); border-radius:var(--radius); padding:0.6rem 1rem; margin-bottom:0.75rem; box-shadow:var(--shadow); display:flex; align-items:center; justify-content:space-between; }
+.cloze-timer .ct-time { font-size:1.2rem; font-weight:800; color:var(--en); }
+.cloze-timer .ct-label { font-size:0.78rem; color:var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay hidden" id="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div class="loading-text" id="loading-text">加载中...</div>
+  <div class="loading-sub" id="loading-sub"></div>
+</div>
+
+<!-- 课文精读overlay -->
+<div class="textbook-overlay" id="textbook-overlay">
+  <div class="textbook-header">
+    <div class="tb-title" id="tb-title">课文精读</div>
+    <button class="tb-close" onclick="closeTextbook()">关闭</button>
+  </div>
+  <div style="background:var(--white);border-radius:var(--radius);padding:0.75rem;margin:0.75rem;box-shadow:var(--shadow)">
+    <div style="font-size:0.85rem;font-weight:700;margin-bottom:0.5rem">选择单元章节</div>
+    <div id="tb-unit-selector" style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.4rem"></div>
+  </div>
+  <div id="tb-action-bar" style="display:none;padding:0 0.75rem 0.75rem">
+    <div style="display:flex;gap:0.5rem">
+      <button class="btn btn-speak" style="flex:1;font-size:0.82rem" onclick="speakTextbook()">🔊 朗读课文</button>
+      <button class="btn btn-primary" style="flex:1;font-size:0.82rem" onclick="finishTextbook()">✓ 跟读完成</button>
+    </div>
+  </div>
+  <div class="textbook-content" id="tb-content" style="display:none"></div>
+</div>
+
+<!-- 单词释义弹窗 -->
+<div class="word-popup" id="word-popup">
+  <div class="wp-word" id="wp-word"></div>
+  <div class="wp-phonetic" id="wp-phonetic"></div>
+  <div class="wp-def" id="wp-def"></div>
+  <button class="wp-speak" onclick="speakPopupWord()">🔊 发音</button>
+</div>
+
+<!-- PAGE: 今日 -->
+<div class="page active" id="page-today">
+  <div class="top-bar">
+    <div class="date-block">
+      <div class="weekday" id="today-weekday">—</div>
+      <div class="date" id="today-date">—</div>
+    </div>
+    <div class="streak-badge" id="streak-badge" style="display:none">
+      <span>🔥</span><span id="streak-num">0</span><span>天</span>
+    </div>
+  </div>
+  <div class="reminder-banner" id="reminder-banner" style="display:none" onclick="scrollToCheckIn()">
+    <span>⏰</span><span id="reminder-text">该开始今天的英语训练了！</span>
+  </div>
+  <div class="check-in-area">
+    <div class="check-in-info">
+      <div class="ci-label">每日打卡</div>
+      <div class="ci-sub" id="check-in-streak-text">连续打卡 0 天</div>
+    </div>
+    <button class="check-in-btn" id="check-in-btn" onclick="checkIn()">立即打卡</button>
+  </div>
+  <div class="progress-section">
+    <div class="progress-ring">
+      <svg width="72" height="72"><circle class="ring-bg" cx="36" cy="36" r="30"/><circle class="ring-fg" cx="36" cy="36" r="30" id="ring-fg" stroke-dasharray="188.5" stroke-dashoffset="188.5"/></svg>
+      <div class="ring-text" id="ring-text">0/0</div>
+    </div>
+    <div class="progress-info">
+      <div class="label">今日英语训练进度</div>
+      <div class="value" id="progress-text">加载中...</div>
+      <div class="sub" id="progress-sub">每日约60分钟</div>
+    </div>
+  </div>
+  <div class="section-label"><span>📚</span> 英语训练任务</div>
+  <div id="en-tasks"></div>
+  <div class="vocab-counter">
+    <div><div class="vc-label">今日新词</div><div class="vc-sub" id="vocab-total-sub">累计 0 词</div></div>
+    <div class="vc-controls">
+      <button class="vc-btn" onclick="adjustVocab(-1)">−</button>
+      <span class="vc-count" id="vocab-today">0</span>
+      <button class="vc-btn" onclick="adjustVocab(1)">+</button>
+    </div>
+  </div>
+  <div class="plan-collapse">
+    <div class="plan-collapse-header" onclick="togglePlanCollapse()">
+      <span>📋 本周计划</span><span id="plan-collapse-icon">▾</span>
+    </div>
+    <div class="plan-collapse-body" id="plan-collapse-body">
+      <div class="semester-switch">
+        <button class="active" id="sem-7a-btn" onclick="switchSemester('7a')">七上</button>
+        <button id="sem-7b-btn" onclick="switchSemester('7b')">七下</button>
+      </div>
+      <div id="plan-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: 背词 -->
+<div class="page" id="page-vocab">
+  <div class="top-bar"><div class="date-block"><div class="weekday" style="font-size:1.1rem">考纲词汇</div><div class="date" id="vocab-progress-text">已学 0 / 0 词</div></div></div>
+  <button class="fetch-btn" id="fetch-vocab-btn" onclick="fetchTodayVocab()">📡 从考纲在线获取今日词汇</button>
+  <div style="background:var(--white);border-radius:var(--radius);padding:1rem;margin-bottom:0.75rem;box-shadow:var(--shadow)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
+      <h3 style="font-size:0.92rem">卡片复习</h3>
+      <span style="font-size:0.75rem;color:var(--muted)" id="review-status">待复习 0 词</span>
+    </div>
+    <div id="flashcard-container"></div>
+    <div class="flashcard-controls" id="flashcard-controls" style="display:none">
+      <button class="btn btn-speak" onclick="speakCurrentWord()">🔊 发音</button>
+      <button class="btn btn-unknown" onclick="reviewCard(false)">不认识</button>
+      <button class="btn btn-known" onclick="reviewCard(true)">认识</button>
+    </div>
+  </div>
+  <div style="background:var(--white);border-radius:var(--radius);padding:1rem;box-shadow:var(--shadow)" id="vocab-list-container">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
+      <h3 style="font-size:0.92rem">我的词汇本</h3>
+      <span style="font-size:0.75rem;color:var(--muted)" id="vocab-list-count">0 词</span>
+    </div>
+    <div id="vocab-list"></div>
+  </div>
+</div>
+
+<!-- PAGE: 听力 -->
+<div class="page" id="page-listening">
+  <div class="top-bar"><div class="date-block"><div class="weekday" style="font-size:1.1rem">听力训练</div><div class="date">在线播放 · 支持语速调节</div></div></div>
+  <div id="listening-exercise-list"></div>
+  <div id="listening-exercise-detail" style="display:none"></div>
+</div>
+
+<!-- PAGE: 完形填空 -->
+<div class="page" id="page-cloze">
+  <div class="top-bar"><div class="date-block"><div class="weekday" style="font-size:1.1rem">完形填空</div><div class="date">AI每日生成 · 点击单词查释义</div></div></div>
+  <div id="cloze-home">
+    <button class="fetch-btn" onclick="generateDailyCloze()">🤖 AI生成今日完形填空</button>
+    <div style="background:var(--white);border-radius:var(--radius);padding:1rem;box-shadow:var(--shadow);margin-bottom:0.75rem">
+      <h4 style="font-size:0.88rem;margin-bottom:0.5rem">完形填空说明</h4>
+      <div style="font-size:0.8rem;color:var(--muted);line-height:1.7">
+        · 每日1篇，适配上海七年级中考水平<br>
+        · 不认识的单词点击可查看中文释义<br>
+        · 做完提交后自动批改<br>
+        · 错题自动编入错题本<br>
+        · 完成后首页任务自动勾选
+      </div>
+    </div>
+    <div style="background:var(--white);border-radius:var(--radius);padding:1rem;box-shadow:var(--shadow)">
+      <h4 style="font-size:0.88rem;margin-bottom:0.5rem">历史记录</h4>
+      <div id="cloze-history"></div>
+    </div>
+  </div>
+  <div id="cloze-exam-area" style="display:none"></div>
+</div>
+
+<!-- PAGE: 模拟卷 -->
+<div class="page" id="page-mock">
+  <div class="top-bar"><div class="date-block"><div class="weekday" style="font-size:1.1rem">模拟卷</div><div class="date">AI智能生成 · 周末推荐</div></div></div>
+  <div id="mock-home">
+    <button class="fetch-btn" onclick="generateMockExam()">🤖 AI生成模拟卷</button>
+    <div style="background:var(--white);border-radius:var(--radius);padding:1rem;box-shadow:var(--shadow);margin-bottom:0.75rem">
+      <h4 style="font-size:0.88rem;margin-bottom:0.5rem">模拟卷说明</h4>
+      <div style="font-size:0.8rem;color:var(--muted);line-height:1.7">
+        · 词汇选择 10题 · 语法选择 10题<br>
+        · 完形填空 10题 · 阅读理解 5题<br>
+        · 共35题，限时45分钟<br>
+        · 每次生成不同题目 · 错题自动入错题本
+      </div>
+    </div>
+    <div style="background:var(--white);border-radius:var(--radius);padding:1rem;box-shadow:var(--shadow)">
+      <h4 style="font-size:0.88rem;margin-bottom:0.5rem">历史成绩</h4>
+      <div id="mock-history"></div>
+    </div>
+  </div>
+  <div id="mock-exam-area" style="display:none"></div>
+</div>
+
+<!-- PAGE: 错题本 -->
+<div class="page" id="page-errors">
+  <div class="top-bar"><div class="date-block"><div class="weekday" style="font-size:1.1rem">错题本</div><div class="date" id="error-count-text">共 0 题</div></div></div>
+  <div class="stat-grid" style="margin-bottom:0.75rem">
+    <div class="stat-card"><div class="num accent-color" id="err-total">0</div><div class="label">错题总数</div></div>
+    <div class="stat-card"><div class="num green-color" id="err-mastered">0</div><div class="label">已掌握</div></div>
+  </div>
+  <div id="error-filters" style="display:flex;gap:0.4rem;margin-bottom:0.75rem;flex-wrap:wrap"></div>
+  <div id="error-list"></div>
+  <div style="margin-top:0.75rem">
+    <button class="btn btn-outline btn-block" onclick="clearAllErrors()" style="font-size:0.78rem">清空错题本</button>
+  </div>
+</div>
+
+<!-- PAGE: 统计 -->
+<div class="page" id="page-stats">
+  <div class="top-bar"><div class="date-block"><div class="weekday" style="font-size:1.1rem">训练统计</div><div class="date">坚持就是胜利</div></div></div>
+  <div class="stat-grid">
+    <div class="stat-card"><div class="num accent-color" id="stat-streak">0</div><div class="label">连续打卡天数</div></div>
+    <div class="stat-card"><div class="num en-color" id="stat-vocab">0</div><div class="label">已学词汇量</div></div>
+    <div class="stat-card"><div class="num en-color" id="stat-week-tasks">0</div><div class="label">本周完成任务</div></div>
+    <div class="stat-card"><div class="num green-color" id="stat-listening">0</div><div class="label">听力练习次数</div></div>
+  </div>
+  <div class="heatmap"><h4>最近14天</h4><div class="heatmap-labels" id="heatmap-labels"></div><div class="heatmap-grid" id="heatmap-grid"></div></div>
+  <div class="milestone-card">
+    <h4>词汇量里程碑 800 → 2000</h4>
+    <div class="milestone-bar"><div class="milestone-fill" id="milestone-fill" style="width:0%"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:var(--muted)">
+      <span id="milestone-current">0 词</span><span id="milestone-target">目标 2000 词</span>
+    </div>
+  </div>
+  <div class="milestone-card"><h4>阶段目标</h4><div id="milestone-list" style="font-size:0.82rem;line-height:2"></div></div>
+  <div class="reminder-settings">
+    <h4>⏰ 打卡提醒设置</h4>
+    <div class="reminder-row"><label>每日提醒时间</label><input type="time" id="reminder-time" value="19:00" onchange="updateReminderTime()"></div>
+    <div class="reminder-row"><label>开启提醒</label><div class="toggle-switch on" id="reminder-toggle" onclick="toggleReminder()"></div></div>
+    <div class="reminder-row"><label>浏览器通知</label><button class="notify-btn" id="notify-btn" onclick="requestNotifyPermission()">开启通知</button></div>
+  </div>
+</div>
+
+<nav class="bottom-nav">
+  <div class="nav-item active" onclick="switchPage('today')"><div class="nav-icon">📅</div><div>今日</div></div>
+  <div class="nav-item" onclick="switchPage('vocab')"><div class="nav-icon">📝</div><div>背词</div></div>
+  <div class="nav-item" onclick="switchPage('listening')"><div class="nav-icon">🎧</div><div>听力</div></div>
+  <div class="nav-item" onclick="switchPage('cloze')"><div class="nav-icon">📖</div><div>完形</div></div>
+  <div class="nav-item" onclick="switchPage('mock')"><div class="nav-icon">📄</div><div>模拟</div></div>
+  <div class="nav-item" onclick="switchPage('errors')"><div class="nav-icon">❌</div><div>错题</div></div>
+  <div class="nav-item" onclick="switchPage('stats')"><div class="nav-icon">📊</div><div>统计</div></div>
+</nav>
+
+<div class="toast" id="toast"></div>
+<div class="modal-overlay" id="modal-overlay"><div class="modal" id="modal-content"></div></div>
+
+<script>
+// ==================== DATA LAYER ====================
+const STORE_KEY = 'enTrainer_v3';
+
+function loadData() {
+  try { const raw = localStorage.getItem(STORE_KEY); if (raw) return JSON.parse(raw); } catch(e) {}
+  return {
+    tasks: {}, vocabToday: {}, vocabProgress: {}, fetchedWords: [],
+    semester: '7a', startDate: getTodayStr(), checkIns: {}, checkInStreak: 0,
+    reminder: { time: '19:00', enabled: true }, lastNotifyDate: null,
+    listeningDone: {}, mockScores: [], errorBook: [],
+    clozeDone: {}, clozeHistory: [], textbookRead: {}
+  };
+}
+function saveData() { localStorage.setItem(STORE_KEY, JSON.stringify(data)); }
+function getTodayStr() { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function getDateStr(offset) { const d=new Date(); d.setDate(d.getDate()+offset); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+let data = loadData();
+
+// ==================== SYLLABUS VOCABULARY ====================
+const VOCAB_7A = [
+  ['relative','亲属',1],['grandson','孙子',1],['granddaughter','孙女',1],['member','成员',1],['cycle','骑车',1],['badminton','羽毛球',1],['restaurant','餐厅',1],['cinema','电影院',1],['together','一起',1],['only','只有',1],
+  ['honest','诚实的',2],['helpful','乐于助人的',2],['kind','善良的',2],['cruel','残忍的',2],['naughty','淘气的',2],['generous','慷慨的',2],['hardworking','勤奋的',2],['lazy','懒惰的',2],['funny','有趣的',2],['smart','聪明的',2],
+  ['nearby','附近的',3],['underground','地铁',3],['tunnel','隧道',3],['bridge','桥',3],['pavement','人行道',3],['crossing','十字路口',3],['traffic','交通',3],['direction','方向',3],['straight','笔直的',3],['along','沿着',3],
+  ['spicy','辣的',4],['sweet','甜的',4],['sour','酸的',4],['bitter','苦的',4],['salty','咸的',4],['tasty','美味的',4],['delicious','美味的',4],['fresh','新鲜的',4],['frozen','冷冻的',4],['boiled','煮的',4],
+  ['healthy','健康的',5],['diet','饮食',5],['nutrition','营养',5],['protein','蛋白质',5],['vitamin','维生素',5],['calcium','钙',5],['energy','能量',5],['calorie','卡路里',5],['exercise','锻炼',5],['habit','习惯',5],
+  ['tourist','游客',6],['scenic','风景优美的',6],['historical','历史的',6],['modern','现代的',6],['traditional','传统的',6],['ancient','古老的',6],['temple','寺庙',6],['palace','宫殿',6],['museum','博物馆',6],['attract','吸引',6],
+  ['warning','警告',7],['instruction','指示',7],['entrance','入口',7],['exit','出口',7],['forbidden','禁止的',7],['danger','危险',7],['safety','安全',7],['careful','小心的',7],['prohibit','禁止',7],['litter','垃圾',7],
+  ['blouse','女衬衫',8],['trousers','裤子',8],['jeans','牛仔裤',8],['skirt','短裙',8],['jacket','夹克',8],['sweater','毛衣',8],['scarf','围巾',8],['glove','手套',8],['sandal','凉鞋',8],['uniform','制服',8],
+  ['celebrate','庆祝',9],['decorate','装饰',9],['invite','邀请',9],['guest','客人',9],['balloon','气球',9],['candle','蜡烛',9],['present','礼物',9],['prepare','准备',9],['welcome','欢迎',9],['enjoy','享受',9],
+  ['resolution','决心',10],['improve','改进',10],['goal','目标',10],['achieve','实现',10],['success','成功',10],['practice','练习',10],['progress','进步',10],['challenge','挑战',10],['effort','努力',10],['overcome','克服',10]
+];
+const VOCAB_7B = [
+  ['guide','导游',1],['tour','旅行',1],['explore','探索',1],['adventure','冒险',1],['journey','旅程',1],['destination','目的地',1],['scenery','风景',1],['landmark','地标',1],['route','路线',1],['compass','指南针',1],
+  ['waste','浪费',2],['leak','渗漏',2],['tap','水龙头',2],['shower','淋浴',2],['liquid','液体',2],['fresh','淡的',2],['salt','盐',2],['stream','溪流',2],['pollute','污染',2],['recycle','回收',2],
+  ['environment','环境',3],['protect','保护',3],['pollution','污染',3],['reduce','减少',3],['reuse','再利用',3],['planet','行星',3],['climate','气候',3],['desert','沙漠',3],['forest','森林',3],['valley','山谷',3],
+  ['electric','电的',4],['power','电力',4],['bulb','灯泡',4],['wire','电线',4],['plug','插头',4],['switch','开关',4],['battery','电池',4],['charge','充电',4],['connect','连接',4],['conductor','导体',4],
+  ['career','职业',5],['succeed','成功',5],['fail','失败',5],['dream','梦想',5],['hope','希望',5],['future','未来',5],['ambition','抱负',5],['determination','决心',5],['perseverance','毅力',5],['pursuit','追求',5],
+  ['season','季节',6],['spring','春天',6],['autumn','秋天',6],['warm','温暖的',6],['cool','凉爽的',6],['sunny','晴朗的',6],['windy','有风的',6],['cloudy','多云的',6],['temperature','温度',6],['degree','度数',6],
+  ['robot','机器人',7],['intelligent','智能的',7],['technology','技术',7],['digital','数字的',7],['electronic','电子的',7],['device','设备',7],['screen','屏幕',7],['keyboard','键盘',7],['program','程序',7],['software','软件',7],
+  ['enjoyable','令人愉快的',8],['activity','活动',8],['club','社团',8],['debate','辩论',8],['geography','地理',8],['biology','生物',8],['chemistry','化学',8],['physics','物理',8],['homework','作业',8],['competition','竞赛',8],
+  ['blow','吹',9],['gentle','温和的',9],['breeze','微风',9],['storm','风暴',9],['typhoon','台风',9],['damage','损害',9],['destroy','破坏',9],['rebuild','重建',9],['shelter','避难所',9],['branch','树枝',9],
+  ['automatic','自动的',10],['operate','操作',10],['function','功能',10],['control','控制',10],['system','系统',10],['sensor','传感器',10],['monitor','监控',10],['detect','探测',10],['respond','响应',10],['communicate','交流',10]
+];
+function getSyllabusVocab() { return data.semester === '7a' ? VOCAB_7A : VOCAB_7B; }
+function getNewWords() { return getSyllabusVocab().filter(v => !data.vocabProgress[v[0]]); }
+
+// ==================== TEXTBOOK CONTENT (沪教版七上) ====================
+const TEXTBOOK_UNITS = [
+  {
+    unit: 1, title: 'Unit 1: My Relatives',
+    passage: 'I have a big family. My grandfather is a retired teacher. He is very kind and always tells me interesting stories. My grandmother likes cooking. She makes the most delicious dumplings in the world. My father is an engineer. He is hardworking and responsible. My mother is a doctor. She is helpful and patient. She takes care of sick people every day. I have a younger sister. She is naughty but funny. She always makes everyone laugh. We live together in a big house near the park. Every weekend, we visit our grandparents and have a big family dinner. I love my family very much.',
+    vocab: [['relative','亲属'],['grandfather','祖父'],['retired','退休的'],['hardworking','勤奋的'],['responsible','负责的'],['helpful','乐于助人的'],['patient','耐心的'],['naughty','淘气的'],['dumpling','饺子'],['engineer','工程师']]
+  },
+  {
+    unit: 2, title: 'Unit 2: Our School Life',
+    passage: 'My school life is very colorful. Our school is not far from my home. It takes about fifteen minutes to get there by underground. Classes begin at eight in the morning. We have four classes in the morning and three in the afternoon. My favorite subject is English. Our English teacher, Miss Wang, is very kind and funny. She always makes her classes interesting. We learn new words, read passages, and practice speaking. During the break, my friends and I play badminton on the playground. We also have many clubs to choose from. I joined the English club last month. We practice speaking English every Wednesday after school. I enjoy my school life very much.',
+    vocab: [['colorful','丰富多彩的'],['underground','地铁'],['subject','学科'],['practice','练习'],['break','课间休息'],['playground','操场'],['club','社团'],['join','加入']]
+  },
+  {
+    unit: 3, title: 'Unit 3: Healthy Diet',
+    passage: 'A healthy diet is very important for our body. We should eat different kinds of food every day. Fresh vegetables and fruits are good for our health. They give us vitamins and energy. We also need protein from meat, fish, and eggs. Milk and cheese give us calcium which makes our bones strong. We should not eat too much sweet or salty food. Fast food is tasty but not very healthy. Drinking enough water is also important. We should drink at least eight glasses of water every day. Good eating habits help us stay healthy and study better. Remember, a balanced diet is the key to a healthy life.',
+    vocab: [['diet','饮食'],['protein','蛋白质'],['vitamin','维生素'],['calcium','钙'],['energy','能量'],['balanced','均衡的'],['habit','习惯'],['cheese','奶酪'],['bone','骨头']]
+  },
+  {
+    unit: 4, title: 'Unit 4: A Visit to the Museum',
+    passage: 'Last Saturday, our class visited the Shanghai Museum. It is a famous museum with many historical artifacts. We arrived there by underground in the morning. The museum is very big and modern. First, we saw many ancient bronze vessels. They were made thousands of years ago. Then we went to the painting gallery. The traditional Chinese paintings were beautiful. Our guide told us many interesting stories about the exhibits. We also saw some ancient calligraphy. It was amazing to see how people wrote in the past. We spent three hours there. Before we left, we bought some souvenirs at the museum shop. It was a wonderful and educational trip.',
+    vocab: [['museum','博物馆'],['historical','历史的'],['artifact','文物'],['bronze','青铜'],['vessel','器皿'],['ancient','古老的'],['gallery','展览馆'],['traditional','传统的'],['calligraphy','书法'],['souvenir','纪念品']]
+  },
+  {
+    unit: 5, title: 'Unit 5: Directions and Transport',
+    passage: 'Shanghai is a big city with many modern transport systems. The underground is the fastest way to travel around the city. There are also many buses and taxis on the roads. When you cross the street, you should use the pavement and wait at the crossing. Always follow the traffic lights. When you are not sure about the direction, you can ask someone for help. Most people in Shanghai are friendly and helpful. They will give you directions. If you want to go to a place far away, you can take a taxi or use a map app on your phone. Remember, safety always comes first when you travel.',
+    vocab: [['transport','交通'],['underground','地铁'],['pavement','人行道'],['crossing','十字路口'],['traffic','交通'],['direction','方向'],['straight','笔直的'],['along','沿着'],['safety','安全']]
+  },
+  {
+    unit: 6, title: 'Unit 6: Festivals and Celebrations',
+    passage: 'There are many festivals in China. The Spring Festival is the most important one. Families get together and have a big dinner. We decorate our houses with red lanterns and balloons. Children get red envelopes with money inside. We also light candles and fireworks to celebrate. Another important festival is the Mid-Autumn Festival. We eat mooncakes and watch the full moon. During the Dragon Boat Festival, we eat rice dumplings and watch dragon boat races. Each festival has its own traditions and customs. We invite friends and guests to our home. Everyone enjoys the food and the happy time together. Festivals are wonderful times for family and friends.',
+    vocab: [['festival','节日'],['celebrate','庆祝'],['decorate','装饰'],['invite','邀请'],['guest','客人'],['balloon','气球'],['candle','蜡烛'],['lantern','灯笼'],['firework','烟火'],['custom','习俗']]
+  },
+  {
+    unit: 7, title: 'Unit 7: New Year Resolutions',
+    passage: 'A new year resolution is a promise you make to yourself at the beginning of a new year. Many people make resolutions to improve themselves. Some want to study harder and get better grades. Others want to learn a new skill or practice more sports. The key to achieving your goals is to make a plan and stick to it. First, write down your goals clearly. Second, break them into small steps. Third, practice every day. Fourth, track your progress. When you face challenges, do not give up. With effort and determination, you can overcome any difficulty. Success comes to those who never stop trying. What is your new year resolution?',
+    vocab: [['resolution','决心'],['improve','改进'],['goal','目标'],['achieve','实现'],['success','成功'],['practice','练习'],['progress','进步'],['challenge','挑战'],['effort','努力'],['overcome','克服']]
+  },
+  {
+    unit: 8, title: 'Unit 8: Future Dreams',
+    passage: 'What do you want to be in the future? This is a question that many students think about. Some want to be doctors and help sick people. Others want to be teachers and help children learn. Some dream of becoming engineers or scientists. A few want to be artists or musicians. No matter what you choose, you need to work hard to achieve your dream. First, you should have ambition and a clear goal. Second, you need determination and perseverance. Third, you should never stop learning new things. The future is in your hands. With hope and hard work, you can make your dreams come true. Start working towards your dream today!',
+    vocab: [['future','未来'],['dream','梦想'],['ambition','抱负'],['determination','决心'],['perseverance','毅力'],['pursuit','追求'],['succeed','成功'],['fail','失败'],['career','职业'],['hope','希望']]
+  }
+];
+
+// ==================== CLOZE QUESTION BANK ====================
+const CLOZE_BANK = [
+  {
+    title:'学校开放日', topic:'school',
+    passage:'Last Friday, our school had an Open Day. Many parents came to {0} our school. Our classroom was very clean and {1}. The walls were decorated with our {2} and drawings. Our teacher, Miss Wang, gave a {3} to the parents. She talked about our study {4}. Some students performed a short {5} in English. Everyone did a {6} job. The parents were very {7} with our work. After the event, we {8} some photos together. It was a {9} day!',
+    blanks:[{o:['visit','visiting','visited','visits'],a:0,e:"to visit 参观"},{o:['tidy','dirty','messy','old'],a:0,e:"tidy 整洁的（语境）"},{o:['paintings','paints','paint','painted'],a:0,e:"paintings 画作（复数）"},{o:['speech','speak','speaking','spoke'],a:0,e:"give a speech 演讲"},{o:['progress','program','project','problem'],a:0,e:"study progress 学习进步"},{o:['play','plays','played','playing'],a:0,e:"perform a play 表演短剧"},{o:['great','bad','sad','boring'],a:0,e:"great 很好的（语境）"},{o:['happy','angry','sad','worried'],a:0,e:"happy 满意的（语境）"},{o:['took','take','taking','takes'],a:0,e:"take photos 拍照（过去式took）"},{o:['wonderful','terrible','boring','bad'],a:0,e:"wonderful 精彩的（语境）"}]
+  },
+  {
+    title:'在超市购物', topic:'shopping',
+    passage:'Yesterday afternoon, I went to the {0} near my home. I needed to buy some {1} for dinner. The supermarket was very {2}. Many people were shopping there. First, I went to the fruit {3}. I picked some fresh apples and bananas. Then I went to the meat {4}. I bought some chicken. I also got some milk and {5}. When I got to the checkout, there was a long {6}. I waited for five {7}. The total was fifty-eight yuan. I {8} with my phone. After that, I went home and {9} dinner.',
+    blanks:[{o:['supermarket','school','park','cinema'],a:0,e:"supermarket 超市"},{o:['food','books','clothes','toys'],a:0,e:"food 食物（语境）"},{o:['busy','quiet','empty','small'],a:0,e:"busy 忙碌的（语境）"},{o:['section','room','floor','door'],a:0,e:"fruit section 水果区"},{o:['section','counter','table','shelf'],a:0,e:"meat section 肉类区"},{o:['cheese','shoes','phones','pens'],a:0,e:"cheese 奶酪（食品）"},{o:['queue','line','way','road'],a:0,e:"queue 队伍"},{o:['minutes','hours','days','weeks'],a:0,e:"minutes 分钟（语境）"},{o:['paid','pay','pays','paying'],a:0,e:"paid 支付（过去式）"},{o:['cooked','cook','cooking','cooks'],a:0,e:"cooked 烹饪（过去式）"}]
+  },
+  {
+    title:'我的宠物', topic:'animals',
+    passage:'I have a pet dog named Max. He is a {0} and lovely dog. He has soft {1} fur and big brown eyes. Every morning, I {2} him for a walk in the park. He likes {3} after birds and squirrels. Max is very {4}. He can sit, roll over, and shake hands. When I come home from school, he {5} to the door and wags his tail. I {6} him twice a day. He likes eating meat and {7}. I also give him {8} water. Max is my best {9}. I love him very much.',
+    blanks:[{o:['cute','ugly','scary','dangerous'],a:0,e:"cute 可爱的"},{o:['brown','black','round','square'],a:0,e:"brown fur 棕色毛"},{o:['take','took','taking','takes'],a:0,e:"take for a walk 遛狗"},{o:['chasing','chase','chased','chases'],a:0,e:"chasing 追逐（进行时）"},{o:['smart','shy','lazy','slow'],a:0,e:"smart 聪明的"},{o:['runs','running','run','ran'],a:0,e:"runs 跑（三单）"},{o:['feed','fed','feeding','feeds'],a:0,e:"feed 喂养"},{o:['bones','books','balls','bottles'],a:0,e:"bones 骨头"},{o:['fresh','frozen','dirty','hot'],a:0,e:"fresh water 干净水"},{o:['friend','family','teacher','doctor'],a:0,e:"best friend 最好的朋友"}]
+  },
+  {
+    title:'城市生活', topic:'city',
+    passage:'Shanghai is a {0} and modern city. Many people live and {1} here. Every morning, the streets are {2} with cars and buses. Most people take the {3} to work. The underground is fast and {4}. There are many restaurants with {5} kinds of food. You can find spicy food, {6} food, and delicious seafood. The city has many famous {7} like the Bund and Yu Garden. {8} from all over the world come to visit. People in Shanghai are {9} and helpful.',
+    blanks:[{o:['big','small','old','quiet'],a:0,e:"big 大的（语境）"},{o:['work','play','sleep','study'],a:0,e:"live and work 生活和工作"},{o:['busy','empty','clean','dark'],a:0,e:"busy 忙碌的"},{o:['underground','bike','boat','plane'],a:0,e:"underground 地铁"},{o:['convenient','expensive','slow','dangerous'],a:0,e:"convenient 方便的"},{o:['different','same','no','little'],a:0,e:"different kinds 不同种类"},{o:['sweet','salty','sour','bitter'],a:0,e:"sweet food 甜食"},{o:['places','houses','rooms','shops'],a:0,e:"famous places 著名地点"},{o:['Tourists','Teachers','Doctors','Workers'],a:0,e:"Tourists 游客"},{o:['friendly','rude','shy','quiet'],a:0,e:"friendly 友好的"}]
+  },
+  {
+    title:'运动日', topic:'sports',
+    passage:'Last Wednesday was our School Sports Day. All the students were very {0}. The event started at eight in the morning. First, we had the running {1}. I ran as {2} as I could. I came in second place. Next was the long {3}. My friend Tom jumped the {4}. He got a gold medal. In the afternoon, we had a {5} match. Our class played against Class Two. It was very {6}. Everyone was cheering for their {7}. In the end, our class {8} the match. We were all very {9} of ourselves.',
+    blanks:[{o:['excited','bored','sad','tired'],a:0,e:"excited 激动的"},{o:['race','game','book','test'],a:0,e:"running race 赛跑"},{o:['fast','slow','quickly','well'],a:0,e:"as fast as 尽可能快"},{o:['jump','hop','skip','step'],a:0,e:"long jump 跳远"},{o:['farthest','far','further','far'],a:0,e:"farthest 最远（最高级）"},{o:['football','piano','chess','card'],a:0,e:"football match 足球赛"},{o:['exciting','boring','easy','quiet'],a:0,e:"exciting 激动人心的"},{o:['team','class','friend','teacher'],a:0,e:"team 队伍"},{o:['won','lost','missed','failed'],a:0,e:"won 赢（过去式）"},{o:['proud','afraid','tired','worried'],a:0,e:"proud of 骄傲"}]
+  },
+  {
+    title:'图书馆之旅', topic:'reading',
+    passage:'Every Saturday morning, I go to the {0} library. It is a quiet place with many {1}. The library has different {2}: fiction, science, history, and art. I like reading {3} books. They tell interesting stories about different {4}. The library also has computers. I can {5} the Internet for information. The librarian, Miss Li, is very {6}. She helps me find books I need. I can {7} up to five books at a time. I usually keep them for two {8}. Reading is a good {9}. It helps me learn new words and understand the world.',
+    blanks:[{o:['public','private','personal','public'],a:0,e:"public library 公共图书馆"},{o:['books','balls','shoes','toys'],a:0,e:"books 书"},{o:['sections','rooms','floors','doors'],a:0,e:"sections 区域"},{o:['fiction','food','sport','music'],a:0,e:"fiction 小说"},{o:['places','people','things','times'],a:0,e:"places 地方"},{o:['search','play','watch','listen'],a:0,e:"search the Internet 搜索网络"},{o:['helpful','rude','busy','lazy'],a:0,e:"helpful 乐于助人的"},{o:['borrow','lend','buy','sell'],a:0,e:"borrow 借阅"},{o:['weeks','days','hours','minutes'],a:0,e:"weeks 周"},{o:['habit','hobby','job','task'],a:0,e:"good habit 好习惯"}]
+  },
+  {
+    title:'环保行动', topic:'environment',
+    passage:'Our school started a {0} project last week. We want to {1} our environment. First, we {2} up the park near our school. We collected many bags of {3}. Then we {4} some trees in the garden. Trees help make the air {5}. We also learned to {6} waste. We put paper, plastic, and glass into different bins. This is called {7}. Our teacher said everyone should do something to {8} the planet. Even small actions can make a big {9}. Let us work together to save the earth!',
+    blanks:[{o:['green','red','blue','yellow'],a:0,e:"green project 环保项目"},{o:['protect','destroy','pollute','waste'],a:0,e:"protect 保护"},{o:['cleaned','clean','cleaning','cleans'],a:0,e:"cleaned up 清理（过去式）"},{o:['rubbish','food','water','air'],a:0,e:"rubbish 垃圾"},{o:['planted','plant','plants','planting'],a:0,e:"planted 种植（过去式）"},{o:['clean','dirty','dark','thick'],a:0,e:"clean air 干净空气"},{o:['reduce','add','increase','grow'],a:0,e:"reduce waste 减少浪费"},{o:['recycling','reading','running','singing'],a:0,e:"recycling 回收利用"},{o:['save','hurt','break','waste'],a:0,e:"save the planet 拯救地球"},{o:['difference','problem','mistake','change'],a:0,e:"make a difference 有影响"}]
+  },
+  {
+    title:'一个特别的生日', topic:'celebration',
+    passage:'Last Sunday was my birthday. I had a {0} party at home. I {1} my friends to come. In the morning, my mother {2} a big cake. The house was {3} with balloons and flowers. At noon, my friends arrived. They brought me nice {4}. We sang the birthday {5} together. I made a wish and {6} out the candles. Then we {7} the cake. It was very {8}! After that, we played games and had a {9} time. It was the best birthday ever!',
+    blanks:[{o:['birthday','sports','reading','swimming'],a:0,e:"birthday party 生日派对"},{o:['invited','inviting','invite','invites'],a:0,e:"invited 邀请（过去式）"},{o:['baked','bake','baking','bakes'],a:0,e:"baked 烘焙（过去式）"},{o:['decorated','decoration','decorating','decorates'],a:0,e:"decorated 装饰（过去式）"},{o:['presents','problems','projects','plans'],a:0,e:"presents 礼物"},{o:['song','sound','word','voice'],a:0,e:"birthday song 生日歌"},{o:['blew','blow','blowing','blows'],a:0,e:"blew out 吹灭（过去式）"},{o:['ate','eat','eating','eats'],a:0,e:"ate 吃（过去式）"},{o:['delicious','terrible','sour','bitter'],a:0,e:"delicious 美味的"},{o:['great','bad','boring','sad'],a:0,e:"great time 美好时光"}]
+  },
+  {
+    title:'科技与生活', topic:'technology',
+    passage:'Technology is changing our {0}. Every day, we use many {1} devices. Smart phones are very {2}. We can use them to call, send messages, and take {3}. Many students use {4} to study. We can find information {5} on the Internet. Some schools use {6} screens in the classroom. Teachers can show videos and {7}. Technology makes learning more {8}. But we should not spend too much {9} on screens. We need to protect our eyes.',
+    blanks:[{o:['life','work','study','play'],a:0,e:"life 生活"},{o:['electronic','electric','old','big'],a:0,e:"electronic devices 电子设备"},{o:['useful','useless','heavy','expensive'],a:0,e:"useful 有用的"},{o:['photos','books','food','clothes'],a:0,e:"take photos 拍照"},{o:['computers','pencils','chalk','paper'],a:0,e:"computers 电脑"},{o:['quickly','slowly','quietly','carefully'],a:0,e:"quickly 快速地"},{o:['big','small','old','broken'],a:0,e:"big screens 大屏幕"},{o:['pictures','walls','doors','windows'],a:0,e:"show pictures 展示图片"},{o:['interesting','boring','difficult','easy'],a:0,e:"interesting 有趣的"},{o:['time','money','energy','water'],a:0,e:"spend time 花时间"}]
+  },
+  {
+    title:'旅行计划', topic:'travel',
+    passage:'Summer vacation is coming. My family is planning a {0} to Beijing. We will go there by {1}. It will be a long {2}. I am very {3} about this trip. We want to visit many famous {4}. First, we will go to the Great Wall. It is very {5} and beautiful. Then we will visit the Palace {6}. It has a long history. We also want to try the {7} duck. People say it is very {8}. We will take many {9} during the trip. I cannot wait!',
+    blanks:[{o:['trip','walk','run','ride'],a:0,e:"trip 旅行"},{o:['train','bike','foot','boat'],a:0,e:"by train 乘火车"},{o:['journey','book','song','game'],a:0,e:"journey 旅程"},{o:['excited','bored','sad','scared'],a:0,e:"excited 激动的"},{o:['places','houses','rooms','shops'],a:0,e:"famous places 著名地点"},{o:['long','short','small','new'],a:0,e:"long 长的（语境）"},{o:['Museum','School','Hospital','Bank'],a:0,e:"Palace Museum 故宫"},{o:['roast','boiled','fried','steamed'],a:0,e:"roast duck 烤鸭"},{o:['delicious','terrible','sour','bitter'],a:0,e:"delicious 美味的"},{o:['photos','food','books','clothes'],a:0,e:"take photos 拍照"}]
+  }
+];
+
+// ==================== LISTENING POOLS ====================
+const LISTENING_SHORT_POOL = [
+  {id:'sp0',type:'passage',title:'短文听力 - My School Day',level:'★★☆',passage:'My school day starts at 7:30 in the morning. I have four classes before lunch and three after lunch. My favorite subject is English. Our English teacher Miss Wang is very kind and funny. She always tells us interesting stories. At noon, I have lunch at the school canteen with my friends. After school, I usually play basketball for half an hour. Then I go home and do my homework. I go to bed at 10:00. I love my school life!',questions:[{q:'What time does school start?',o:['7:00','7:30','8:00','8:30'],a:1},{q:'What is the speakers favorite subject?',o:['Math','English','Chinese','Music'],a:1},{q:'Where does the speaker have lunch?',o:['At home','At a restaurant','At the school canteen','At a friends home'],a:2},{q:'What does the speaker do after school?',o:['Plays football','Plays basketball','Goes home directly','Reads books'],a:1}]},
+  {id:'sp1',type:'passage',title:'短文听力 - A Trip to the Park',level:'★★☆',passage:'Last Sunday, my family went to the Century Park. The weather was warm and sunny. We had a picnic on the grass. My younger sister flew a kite. My father and I played badminton. My mother read a book under a tree. In the afternoon, we went boating on the lake. We also saw many beautiful flowers and took lots of photos. We went home at five oclock. It was a wonderful day.',questions:[{q:'Where did the family go?',o:['The zoo','The Century Park','The museum','The cinema'],a:1},{q:'What was the weather like?',o:['Rainy','Cold','Warm and sunny','Cloudy'],a:2},{q:'What did the sister do?',o:['Flew a kite','Read a book','Played badminton','Went boating'],a:0},{q:'When did they go home?',o:['Three oclock','Four oclock','Five oclock','Six oclock'],a:2}]},
+  {id:'sp2',type:'passage',title:'短文听力 - Four Seasons',level:'★★☆',passage:'There are four seasons in a year. Spring is warm and green. Flowers bloom everywhere. Summer is hot and sunny. We can swim in the pool. Autumn is cool and colorful. Leaves turn yellow and red. Winter is cold and white. Children like making snowmen. My favorite season is spring because I love flowers.',questions:[{q:'How many seasons are there?',o:['Three','Four','Five','Six'],a:1},{q:'What is summer like?',o:['Warm and green','Hot and sunny','Cool and colorful','Cold and white'],a:1},{q:'What happens in autumn?',o:['Flowers bloom','Leaves turn yellow and red','We can swim','Children make snowmen'],a:1},{q:'What is the speakers favorite season?',o:['Summer','Autumn','Spring','Winter'],a:2}]},
+  {id:'sp3',type:'passage',title:'短文听力 - My Best Friend',level:'★★☆',passage:'My best friend is Tom. He is thirteen years old. He is tall and thin. He has short black hair and big eyes. He is very honest and helpful. He always helps me with my homework. We both like playing badminton and reading books. We often go to the library together on weekends. Tom is also very funny. He always makes me laugh. I am lucky to have such a good friend.',questions:[{q:'How old is Tom?',o:['Twelve','Thirteen','Fourteen','Fifteen'],a:1},{q:'What does Tom look like?',o:['Short and fat','Tall and thin','Tall and strong','Short and thin'],a:1},{q:'What do they like doing together?',o:['Playing football and swimming','Playing badminton and reading','Watching TV and eating','Shopping and singing'],a:1},{q:'Where do they go on weekends?',o:['The cinema','The park','The library','The restaurant'],a:2}]},
+  {id:'sp4',type:'passage',title:'短文听力 - Shopping with Mom',level:'★★☆',passage:'Yesterday afternoon, I went shopping with my mom. We went to a big supermarket near our home. First, we bought some fresh vegetables and fruits. Then we got some milk and bread for breakfast. My mom also bought me a new notebook and some pens. At the checkout, there was a long queue. We waited for about ten minutes. The total was one hundred and twenty yuan. Mom paid with her phone. We carried the bags home together.',questions:[{q:'Where did they go shopping?',o:['A small shop','A big supermarket','A market','A mall'],a:1},{q:'What did they buy for breakfast?',o:['Eggs and meat','Milk and bread','Fruits only','Nothing'],a:1},{q:'How long did they wait?',o:['Five minutes','Ten minutes','Fifteen minutes','Twenty minutes'],a:1},{q:'How much was the total?',o:['100 yuan','110 yuan','120 yuan','130 yuan'],a:2}]},
+  {id:'sp5',type:'passage',title:'短文听力 - A Visit to the Zoo',level:'★★☆',passage:'Last Saturday, our class went to the Shanghai Zoo. We arrived there by bus at nine in the morning. First, we saw the pandas. They were cute and lazy, eating bamboo all the time. Then we went to see the monkeys. They were very active and funny. They jumped from tree to tree. After that, we saw the elephants. They were big and strong. We also saw many beautiful birds. We had lunch at the zoo restaurant. We went home at three in the afternoon.',questions:[{q:'How did they go to the zoo?',o:['By bus','By underground','On foot','By bike'],a:0},{q:'What was the first animal they saw?',o:['Monkeys','Pandas','Elephants','Birds'],a:1},{q:'How were the monkeys?',o:['Lazy and sleepy','Active and funny','Big and strong','Small and quiet'],a:1},{q:'When did they go home?',o:['Two oclock','Three oclock','Four oclock','Five oclock'],a:1}]},
+  {id:'sp6',type:'passage',title:'短文听力 - My Favorite Food',level:'★★☆',passage:'My favorite food is dumplings. My grandmother makes the best dumplings in the world. Every Spring Festival, our whole family makes dumplings together. We prepare the dough, mix the meat and vegetables for the filling, and then wrap them. I am not very good at wrapping, but I am learning. Dumplings are not only delicious but also a symbol of family togetherness. When I eat dumplings, I feel warm and happy.',questions:[{q:'What is the speakers favorite food?',o:['Noodles','Dumplings','Fried rice','Bread'],a:1},{q:'Who makes the best dumplings?',o:['Mother','Father','Grandmother','Aunt'],a:2},{q:'When does the family make dumplings together?',o:['Mid-Autumn Festival','Spring Festival','Dragon Boat Festival','New Year'],a:1},{q:'How does the speaker feel when eating dumplings?',o:['Cold and hungry','Warm and happy','Sad and lonely','Tired and bored'],a:1}]},
+  {id:'sp7',type:'passage',title:'短文听力 - Sports Day',level:'★★☆',passage:'Last Wednesday was our School Sports Day. All the students were very excited. The event started at eight in the morning. First, we had the running race. I ran as fast as I could and came in second place. Next was the long jump. My friend Tom jumped the farthest. He got a gold medal. In the afternoon, we had a football match. Our class played against Class Two. It was very exciting. In the end, our class won the match.',questions:[{q:'How did the students feel?',o:['Bored','Excited','Tired','Sad'],a:1},{q:'What place did the speaker get in the running race?',o:['First','Second','Third','Fourth'],a:1},{q:'Who got a gold medal?',o:['The speaker','Tom','Class Two','The teacher'],a:1},{q:'Who won the football match?',o:['Class One','Class Two','It was a tie','Nobody'],a:0}]},
+  {id:'sp8',type:'passage',title:'短文听力 - My Hobbies',level:'★★☆',passage:'I have many hobbies. My favorite hobby is reading. I read for thirty minutes every day. I like reading storybooks and science books. My second hobby is playing badminton. I play with my friends after school. It is good exercise. I also enjoy listening to music. My favorite singer is Taylor Swift. On weekends, I like drawing pictures. I am learning to draw animals and flowers. Hobbies make my life colorful and interesting.',questions:[{q:'What is the speakers favorite hobby?',o:['Playing badminton','Reading','Listening to music','Drawing'],a:1},{q:'How long does the speaker read every day?',o:['15 minutes','20 minutes','30 minutes','60 minutes'],a:2},{q:'What sport does the speaker play?',o:['Football','Basketball','Badminton','Tennis'],a:2},{q:'What does the speaker do on weekends?',o:['Reads books','Plays sports','Draws pictures','Listens to music'],a:2}]},
+  {id:'sp9',type:'passage',title:'短文听力 - A Beautiful City',level:'★★☆',passage:'Shanghai is a big and beautiful city. It has many tall buildings and beautiful parks. The Bund is the most famous place. You can see the Huangpu River and many historical buildings there. Yu Garden is also popular. It is a traditional Chinese garden. The Oriental Pearl Tower is very tall. You can see the whole city from the top. Shanghai has many restaurants with different kinds of food. Xiaolongbao is the most famous local food. Millions of tourists visit Shanghai every year.',questions:[{q:'What is the most famous place in Shanghai?',o:['Yu Garden','The Bund','The Oriental Pearl Tower','Nanjing Road'],a:1},{q:'What river can you see at the Bund?',o:['The Yangtze River','The Huangpu River','The Suzhou Creek','The Huanghe River'],a:1},{q:'What is Yu Garden?',o:['A modern park','A traditional Chinese garden','A shopping mall','A museum'],a:1},{q:'What is the most famous local food?',o:['Peking duck','Xiaolongbao','Hot pot','Mapo tofu'],a:1}]}
+];
+const LISTENING_MOCK_POOL = [
+  {id:'mp0',type:'passage',title:'综合听力模拟 - City Life',level:'★★★',passage:'Shanghai is a big and modern city. There are many tall buildings and beautiful parks. Every morning, many people take the underground to work. The streets are busy with cars and buses. There are also many restaurants with different kinds of food. You can find spicy food, sweet food, and delicious seafood. The city has many famous places like the Bund and Yu Garden. Tourists from all over the world come to visit. The weather is warm in spring and hot in summer. People in Shanghai are friendly and helpful. It is a great city to live in.',questions:[{q:'What kind of city is Shanghai?',o:['Small and old','Big and modern','Small and modern','Big and old'],a:1},{q:'How do many people go to work?',o:['By car','By underground','On foot','By bike'],a:1},{q:'What kind of food can you find?',o:['Only spicy food','Only sweet food','Different kinds of food','Only seafood'],a:2},{q:'What famous places are mentioned?',o:['The Great Wall and Yu Garden','The Bund and Yu Garden','Terra Cotta Warriors and Yu Garden','West Lake and the Bund'],a:1},{q:'How is the weather in spring?',o:['Cold','Hot','Warm','Cool'],a:2}]},
+  {id:'mp1',type:'passage',title:'综合听力模拟 - School Life',level:'★★★',passage:'Our school is very big and beautiful. It has a large playground, a library, and a science building. There are about one thousand students in our school. We have many subjects to choose from, like English, math, Chinese, science, music and art. My favorite subject is English. Our English teacher, Miss Wang, is very kind and funny. She always makes her classes interesting. We learn new words, read passages, and practice speaking. We also have many clubs. I joined the English club last month. We practice speaking English every Wednesday after school.',questions:[{q:'How many students are there?',o:['About 500','About 1000','About 1500','About 2000'],a:1},{q:'What is the speakers favorite subject?',o:['Math','English','Chinese','Science'],a:1},{q:'What is Miss Wang like?',o:['Strict and serious','Kind and funny','Boring and tired','Quiet and shy'],a:1},{q:'What club did the speaker join?',o:['The math club','The English club','The music club','The art club'],a:1},{q:'When do they practice English?',o:['Monday','Tuesday','Wednesday','Friday'],a:2}]},
+  {id:'mp2',type:'passage',title:'综合听力模拟 - Travel Experience',level:'★★★',passage:'Last summer, my family took a trip to Beijing. We went there by train. The journey took about five hours. We stayed in a hotel near the city center. On the first day, we visited the Great Wall. It was very long and beautiful. I was excited to see it. On the second day, we went to the Palace Museum. It has a long history. We saw many ancient buildings and artifacts there. On the third day, we visited a traditional Beijing alley called Hutong. We also tried the famous roast duck. It was very delicious. We took many photos during the trip.',questions:[{q:'How did they go to Beijing?',o:['By plane','By train','By bus','By car'],a:1},{q:'How long was the journey?',o:['3 hours','4 hours','5 hours','6 hours'],a:2},{q:'What did they visit on the first day?',o:['The Palace Museum','The Great Wall','Tiananmen Square','The Hutong'],a:1},{q:'What does the Palace Museum have?',o:['A short history','A long history','Modern art','Nothing special'],a:1},{q:'What food did they try?',o:['Peking duck','Roast duck','Noodles','Dumplings'],a:1}]}
+];
+function getTodayListening() {
+  const dayIndex = Math.floor((new Date(getTodayStr()) - new Date('2026-09-01')) / 86400000);
+  const shortStart = (dayIndex * 5) % LISTENING_SHORT_POOL.length;
+  const mockIdx = dayIndex % LISTENING_MOCK_POOL.length;
+  const shorts = [];
+  for (let i = 0; i < 5; i++) {
+    shorts.push({...LISTENING_SHORT_POOL[(shortStart + i) % LISTENING_SHORT_POOL.length], id: 's' + i});
+  }
+  const mock = {...LISTENING_MOCK_POOL[mockIdx], id: 'mock'};
+  return { shorts, mock };
+}
+function getTodayListeningDone() {
+  const today = getTodayStr();
+  if (!data.listeningDone) data.listeningDone = {};
+  if (!data.listeningDone[today]) data.listeningDone[today] = {};
+  return data.listeningDone[today];
+}
+function checkListeningAllDone() {
+  const done = getTodayListeningDone();
+  const todays = getTodayListening();
+  const allIds = [...todays.shorts.map(s => s.id), todays.mock.id];
+  const allDone = allIds.every(id => done[id]);
+  if (allDone) {
+    const dow = getDayOfWeek();
+    const plan = PLANS[data.semester][dow] || [];
+    const listeningTask = plan.find(t => t.id === 'listening' || t.id === 'listeningmock');
+    if (listeningTask && !getTodayTasks()[listeningTask.id]) autoCompleteTask(listeningTask.id);
+  }
+}
+// ==================== LISTENING EXERCISES (LEGACY) ====================
+const LISTENING_EX = [
+  {id:'l3',type:'dialogue',title:'对话听力 - 在餐厅',level:'★★☆',dialogue:[{s:'A',t:'Welcome! What would you like to order?'},{s:'B',t:'I would like some spicy chicken and rice.'},{s:'A',t:'Would you like something to drink?'},{s:'B',t:'Yes, a cup of green tea, please.'},{s:'A',t:'Anything else?'},{s:'B',t:'No, that is all. Thank you.'}],questions:[{q:'What does B want to eat?',o:['Sweet and sour pork','Spicy chicken and rice','Fried noodles','Steamed fish'],a:1},{q:'What does B want to drink?',o:['Coffee','Orange juice','Green tea','Milk'],a:2},{q:'How many items did B order?',o:['One','Two','Three','Four'],a:1}]},
+  {id:'l4',type:'dialogue',title:'对话听力 - 问路',level:'★★☆',dialogue:[{s:'A',t:'Excuse me, how can I get to the museum?'},{s:'B',t:'Go straight along this road and turn left at the crossing.'},{s:'A',t:'Is it far from here?'},{s:'B',t:'No, it is about ten minutes walk.'},{s:'A',t:'Thank you very much!'},{s:'B',t:'You are welcome.'}],questions:[{q:'Where does A want to go?',o:['The cinema','The museum','The temple','The restaurant'],a:1},{q:'How should A go?',o:['Turn right at the crossing','Go straight and turn left','Take the underground','Take a bus'],a:1},{q:'How far is it?',o:['Five minutes walk','Ten minutes walk','Fifteen minutes walk','Twenty minutes walk'],a:1}]},
+  {id:'l5',type:'passage',title:'短文听力 - 四季',level:'★★☆',passage:'There are four seasons in a year. Spring is warm and green. Flowers bloom everywhere. Summer is hot and sunny. We can swim in the pool. Autumn is cool and colorful. Leaves turn yellow and red. Winter is cold and white. Children like making snowmen. My favorite season is spring because I love flowers.',questions:[{q:'How many seasons are there?',o:['Three','Four','Five','Six'],a:1},{q:'What is summer like?',o:['Warm and green','Hot and sunny','Cool and colorful','Cold and white'],a:1},{q:'What happens in autumn?',o:['Flowers bloom','Leaves turn yellow and red','We can swim','Children make snowmen'],a:1},{q:'What is the speakers favorite season?',o:['Summer','Autumn','Spring','Winter'],a:2}]},
+  {id:'l6',type:'passage',title:'短文听力 - 我的一天',level:'★★☆',passage:'Every morning I get up at six thirty. I have breakfast at seven. I go to school by underground. It takes about twenty minutes. Classes begin at eight. We have English, math and Chinese in the morning. After lunch, we have music and art. School finishes at three thirty. After school, I play badminton with my friends. I go home at five. I do my homework after dinner. I go to bed at nine thirty.',questions:[{q:'What time does the speaker get up?',o:['Six oclock','Six thirty','Seven oclock','Seven thirty'],a:1},{q:'How does the speaker go to school?',o:['By bus','By underground','On foot','By bike'],a:1},{q:'How long does the trip take?',o:['Ten minutes','Fifteen minutes','Twenty minutes','Thirty minutes'],a:2},{q:'What does the speaker do after school?',o:['Plays football','Plays badminton','Goes home directly','Does homework'],a:1}]},
+  {id:'l7',type:'passage',title:'短文听力 - 我最好的朋友',level:'★★★',passage:'My best friend is Tom. He is thirteen years old. He is tall and thin. He has short black hair and big eyes. He is very honest and helpful. He always helps me with my homework. We both like playing badminton and reading books. We often go to the library together on weekends. Tom is also very funny. He always makes me laugh. I am lucky to have such a good friend.',questions:[{q:'How old is Tom?',o:['Twelve','Thirteen','Fourteen','Fifteen'],a:1},{q:'What does Tom look like?',o:['Short and fat','Tall and thin','Tall and strong','Short and thin'],a:1},{q:'What do they like doing together?',o:['Playing football and swimming','Playing badminton and reading','Watching TV and eating','Shopping and singing'],a:1},{q:'Where do they go on weekends?',o:['The cinema','The park','The library','The restaurant'],a:2}]},
+  {id:'l8',type:'passage',title:'综合听力模拟 - 城市生活',level:'★★★',passage:'Shanghai is a big and modern city. There are many tall buildings and beautiful parks. Every morning, many people take the underground to work. The streets are busy with cars and buses. There are also many restaurants with different kinds of food. You can find spicy food, sweet food, and delicious seafood. The city has many famous places like the Bund and Yu Garden. Tourists from all over the world come to visit. The weather is warm in spring and hot in summer. People in Shanghai are friendly and helpful. It is a great city to live in.',questions:[{q:'What kind of city is Shanghai?',o:['Small and old','Big and modern','Small and modern','Big and old'],a:1},{q:'How do many people go to work?',o:['By car','By underground','On foot','By bike'],a:1},{q:'What kind of food can you find?',o:['Only spicy food','Only sweet food','Different kinds of food','Only seafood'],a:2},{q:'What famous places are mentioned?',o:['The Great Wall and Yu Garden','The Bund and Yu Garden','Terra Cotta Warriors and Yu Garden','West Lake and the Bund'],a:1},{q:'How is the weather in spring?',o:['Cold','Hot','Warm','Cool'],a:2}]}
+];
+
+// ==================== MOCK EXAM QUESTION BANKS ====================
+const MOCK_VOCAB_Q=[
+  {q:'My ___ is my fathers father.',o:['grandfather','uncle','cousin','nephew'],a:0,e:'grandfather 祖父'},
+  {q:'This soup tastes too ___.',o:['salty','salt','saltily','salted'],a:0,e:'taste + adj. 形容词'},
+  {q:'She is very ___. She always helps others.',o:['cruel','helpful','naughty','lazy'],a:1,e:'helpful 乐于助人的'},
+  {q:'Please go ___ along this road.',o:['straight','straightly','straightforward','straightforwardly'],a:0,e:'go straight 固定搭配'},
+  {q:'Fresh vegetables are ___ for your health.',o:['good','well','better','best'],a:0,e:'be good for 对...有益'},
+  {q:'The ___ is a famous tourist ___.',o:['temple,attraction','temple,attract','temple,attractive','temple,attracting'],a:0,e:'tourist attraction 旅游景点'},
+  {q:'He ___ a new jacket yesterday.',o:['bought','buy','buying','buys'],a:0,e:'buy 过去式 bought'},
+  {q:'There are many ___ in the museum.',o:['attract','attracts','attractions','attracted'],a:2,e:'attraction 名词形式'},
+  {q:'It is ___ to swim in this river.',o:['danger','dangerous','dangerously','dangers'],a:1,e:'dangerous 形容词'},
+  {q:'She ___ to school by underground every day.',o:['go','goes','going','went'],a:1,e:'三单变化'},
+  {q:'The food smells ___.',o:['delicious','deliciously','deliciousness','delicate'],a:0,e:'smell + adj.'},
+  {q:'We should ___ more water.',o:['drinking','drink','drinks','drank'],a:1,e:'should + 动词原形'},
+  {q:'They ___ badminton together last Sunday.',o:['play','plays','played','playing'],a:2,e:'过去式'},
+  {q:'I ___ to improve my English this year.',o:['resolution','resolve','resolute','resolving'],a:1,e:'resolve to do 决心做'},
+  {q:'He is ___ at math than English.',o:['good','better','best','well'],a:1,e:'比较级'},
+  {q:'___ your hands before meals.',o:['Wash','Washing','Washes','Washed'],a:0,e:'祈使句'},
+  {q:'The ___ food in Shanghai is very tasty.',o:['tradition','traditional','traditionally','traditions'],a:1,e:'traditional 传统的'},
+  {q:'Look! The boy ___ a kite.',o:['fly','flies','is flying','flew'],a:2,e:'现在进行时'},
+  {q:'The party was ___. Everyone enjoyed it.',o:['enjoy','enjoyable','enjoyment','enjoying'],a:1,e:'enjoyable 令人愉快的'},
+  {q:'It is important ___ a balanced diet.',o:['eat','eating','to eat','ate'],a:2,e:'It is important to do'}
+];
+const MOCK_GRAMMAR_Q=[
+  {q:'She ___ to school every day.',o:['go','goes','going','went'],a:1,e:'一般现在时，三单变化'},
+  {q:'There ___ some milk in the glass.',o:['is','are','was','were'],a:0,e:'不可数名词用is'},
+  {q:'He ___ his homework yesterday.',o:['do','does','did','doing'],a:2,e:'一般过去时'},
+  {q:'Look! The children ___ in the park.',o:['play','plays','are playing','played'],a:2,e:'现在进行时'},
+  {q:'I ___ English since 2020.',o:['learn','learned','have learned','am learning'],a:2,e:'现在完成时'},
+  {q:'There ___ a book and two pens on the desk.',o:['is','are','was','were'],a:0,e:'就近原则'},
+  {q:'She ___ taller than her sister.',o:['is','are','has','have'],a:0,e:'比较级'},
+  {q:'___ you like some tea?',o:['Do','Would','Are','Have'],a:1,e:'Would you like 礼貌用语'},
+  {q:'He ___ to school by bus yesterday.',o:['go','goes','went','going'],a:2,e:'过去式'},
+  {q:'The boy ___ is playing football is my brother.',o:['who','which','what','where'],a:0,e:'定语从句，人用who'},
+  {q:'I will call you ___ I arrive.',o:['when','before','until','unless'],a:0,e:'时间状语从句'},
+  {q:'This is ___ interesting book.',o:['a','an','the','/'],a:1,e:'元音音素开头用an'},
+  {q:'She is ___ girl in our class.',o:['tall','taller','tallest','the tallest'],a:3,e:'最高级加the'},
+  {q:'___ hard work it is!',o:['What','What a','How','How a'],a:0,e:'感叹句，不可数名词'},
+  {q:'He asked me ___ I lived.',o:['that','which','where','what'],a:2,e:'宾语从句'},
+  {q:'The book is ___ the desk.',o:['in','on','at','under'],a:1,e:'方位介词'},
+  {q:'I have ___ friends in Shanghai.',o:['much','many','a lot','lot of'],a:1,e:'可数名词用many'},
+  {q:'She ___ TV when I came in.',o:['watch','watches','was watching','watched'],a:2,e:'过去进行时'},
+  {q:'___ sunny day it is!',o:['What','What a','How','How a'],a:1,e:'感叹句，可数名词'},
+  {q:'You ___ study hard for the exam.',o:['should','can','may','will'],a:0,e:'情态动词'},
+  {q:'He has lived here ___ ten years.',o:['for','since','in','from'],a:0,e:'for + 时间段'},
+  {q:'Neither Tom nor I ___ a student.',o:['am','is','are','be'],a:0,e:'就近原则，I用am'},
+  {q:'The movie is ___ interesting ___ I want to see it again.',o:['so,that','such,that','too,to','very,that'],a:0,e:'so...that... 句型'},
+  {q:'If it ___ tomorrow, we will stay home.',o:['rain','rains','will rain','rained'],a:1,e:'条件状语从句，主将从现'},
+  {q:'She told me that she ___ the exam.',o:['pass','passes','passed','passing'],a:2,e:'宾语从句时态一致'}
+];
+const MOCK_CLOZE=[
+  {title:'完形填空 - 我的周末',passage:'Last Sunday, I {0} to the park with my family. The weather was {1} and sunny. We {2} a picnic under a big tree. My mother {3} some delicious food. My father and I {4} badminton. My little sister {5} a kite. We {6} a great time there. In the afternoon, we {7} some photos. Before we left, we {8} sure to clean up. It was a {9} day!',blanks:[{o:['go','went','going','goes'],a:1,e:'过去式'},{o:['warm','warmly','warming','warmed'],a:0,e:'形容词作表语'},{o:['have','had','having','has'],a:1,e:'过去式'},{o:['cook','cooked','cooking','cooks'],a:1,e:'过去式'},{o:['play','played','playing','plays'],a:1,e:'过去式'},{o:['fly','flew','flied','flying'],a:1,e:'fly过去式flew'},{o:['have','had','has','having'],a:1,e:'过去式'},{o:['take','took','taking','takes'],a:1,e:'过去式'},{o:['make','made','making','makes'],a:1,e:'过去式'},{o:['good','well','better','best'],a:0,e:'形容词'}]},
+  {title:'完形填空 - 我的学校',passage:'My school is very {0}. It has a big playground and a beautiful {1}. There are about one thousand {2} in our school. We have many {3} to choose from, like English, math, Chinese, music and art. My favorite {4} is English. Our English teacher is very {5}. She always makes her classes {6}. We often play {7} after class. I have many good {8} at school. I love my {9}!',blanks:[{o:['big','small','far','old'],a:0,e:'语境理解'},{o:['garden','kitchen','garage','basement'],a:0,e:'语境理解'},{o:['students','teachers','workers','doctors'],a:0,e:'语境理解'},{o:['subjects','sports','games','foods'],a:0,e:'subjects 学科'},{o:['subject','sport','game','food'],a:0,e:'subject 学科'},{o:['kind','cruel','lazy','naughty'],a:0,e:'语境理解'},{o:['interesting','boring','difficult','scary'],a:0,e:'语境理解'},{o:['games','tricks','jokes','roles'],a:0,e:'play games'},{o:['friends','enemies','relatives','guests'],a:0,e:'语境理解'},{o:['school','home','park','shop'],a:0,e:'语境理解'}]},
+  {title:'完形填空 - 一次旅行',passage:'Last summer, my family went to Beijing for a {0}. We went there {1} train. It was a long {2}. We visited the Great Wall. It was very {3} and beautiful. I was {4} to see it. We also went to the Palace {5}. It has a long {6}. We took many {7}. The food in Beijing was very {8}, especially the roast duck. We had a {9} time.',blanks:[{o:['trip','shop','class','meeting'],a:0,e:'语境理解'},{o:['by','on','in','with'],a:0,e:'by train'},{o:['journey','book','tree','river'],a:0,e:'journey 旅程'},{o:['famous','shy','lazy','weak'],a:0,e:'语境理解'},{o:['excited','bored','angry','sad'],a:0,e:'语境理解'},{o:['Museum','School','Hospital','Bank'],a:0,e:'Palace Museum 故宫'},{o:['history','story','book','film'],a:0,e:'语境理解'},{o:['photos','food','books','clothes'],a:0,e:'语境理解'},{o:['delicious','terrible','spicy','sour'],a:0,e:'语境理解'},{o:['great','bad','boring','hard'],a:0,e:'语境理解'}]}
+];
+const MOCK_READING=[
+  {title:'阅读理解 - Shanghai',passage:'Shanghai is one of the biggest cities in China. It has a population of over 24 million people. The city is famous for the Bund, Yu Garden and the Oriental Pearl Tower. Many tourists visit Shanghai every year. The weather is warm in spring, hot in summer, cool in autumn and cold in winter. People in Shanghai speak Shanghainese and Mandarin. The food is delicious, especially xiaolongbao. Shanghai is a modern and beautiful city.',questions:[{q:'How many people live in Shanghai?',o:['Over 14 million','Over 24 million','Over 34 million','Over 4 million'],a:1},{q:'What is Shanghai famous for?',o:['The Great Wall','The Bund','Terra Cotta Warriors','West Lake'],a:1},{q:'What is the weather like in spring?',o:['Cold','Hot','Warm','Cool'],a:2},{q:'What food is mentioned?',o:['Peking duck','Xiaolongbao','Hot pot','Mapo tofu'],a:1},{q:'What languages do people speak?',o:['Cantonese and Mandarin','Shanghainese and Mandarin','English and Mandarin','Korean and Mandarin'],a:1}]},
+  {title:'阅读理解 - A Good Habit',passage:'Reading is a good habit. It can help us learn new words and improve our writing. When we read, we can travel to different places without going out. We can learn about different cultures and people. Some people like reading novels, while others prefer science books. No matter what you read, reading is always good for you. Try to read for thirty minutes every day. You will find that your English becomes better and better. Start reading today!',questions:[{q:'What can reading help us do?',o:['Play games','Learn new words and improve writing','Watch TV','Sleep better'],a:1},{q:'What can we do when we read?',o:['Travel to different places','Cook food','Play sports','Watch movies'],a:0},{q:'How long should we read every day?',o:['Ten minutes','Twenty minutes','Thirty minutes','Sixty minutes'],a:2},{q:'What will happen if you read every day?',o:['Your English becomes better','You will be rich','You will be famous','You will be strong'],a:0},{q:'What kind of books do some people like?',o:['Only novels','Only science books','Novels or science books','Only comic books'],a:2}]},
+  {title:'阅读理解 - My School Day',passage:'I am a student at No.1 Middle School. My school day starts at 7:30 in the morning. I have four classes in the morning and three in the afternoon. My favorite class is English. Our English teacher, Miss Wang, is very kind and funny. She always tells us interesting stories. At noon, I have lunch at the school canteen with my friends. After school, I usually play basketball for half an hour. Then I go home and do my homework. I go to bed at 10:00. I love my school life!',questions:[{q:'When does the school day start?',o:['7:00','7:30','8:00','8:30'],a:1},{q:'How many classes does the speaker have each day?',o:['Five','Six','Seven','Eight'],a:2},{q:'Who is the English teacher?',o:['Miss Li','Miss Wang','Mr. Wang','Mr. Li'],a:1},{q:'Where does the speaker have lunch?',o:['At home','At a restaurant','At the school canteen','At a friends home'],a:2},{q:'What does the speaker do after school?',o:['Plays football','Plays basketball','Goes home directly','Reads books'],a:1}]}
+];
+
+// ==================== WEEKLY PLANS ====================
+const PLANS = {
+  '7a': {
+    1:[{id:'vocab',name:'词汇背诵',time:'25min',detail:'在线获取考纲词汇20个，背词页面卡片复习'},{id:'reading',name:'课文精读',time:'10min',detail:'在线获取沪教版七上课文，10分钟定时阅读'},{id:'cloze',name:'完形填空',time:'10min',detail:'AI生成今日完形填空1篇，提交批改'},{id:'listening',name:'听力训练',time:'10min',detail:'听力页面完成1篇对话听力'}],
+    2:[{id:'vocab',name:'词汇复习',time:'25min',detail:'艾宾浩斯复习昨日词汇+新词20个'},{id:'reading',name:'课文精读',time:'10min',detail:'在线获取沪教版七上课文，10分钟定时阅读'},{id:'cloze',name:'完形填空',time:'10min',detail:'AI生成今日完形填空1篇'},{id:'listening',name:'听力训练',time:'10min',detail:'影子跟读（不看文本跟读）'}],
+    3:[{id:'vocab',name:'词汇背诵',time:'25min',detail:'在线获取新词20个+复习'},{id:'reading',name:'课文精读',time:'10min',detail:'在线获取沪教版七上课文'},{id:'cloze',name:'完形填空',time:'10min',detail:'AI生成今日完形填空1篇'},{id:'listening',name:'听力训练',time:'10min',detail:'跟读+复述'}],
+    4:[{id:'vocab',name:'词汇复习',time:'25min',detail:'艾宾浩斯复习+新词20个'},{id:'reading',name:'课文精读',time:'10min',detail:'在线获取沪教版七上课文'},{id:'cloze',name:'完形填空',time:'10min',detail:'AI生成今日完形填空1篇'},{id:'listening',name:'听力训练',time:'10min',detail:'听力页面完成1篇对话听力'}],
+    5:[{id:'vocab',name:'词汇背诵',time:'25min',detail:'复习+新词20个，周累计100词'},{id:'reading',name:'课文精读',time:'10min',detail:'本周课文回顾'},{id:'cloze',name:'完形填空',time:'10min',detail:'AI生成今日完形填空1篇'},{id:'listening',name:'听力训练',time:'10min',detail:'听力页面完成1篇短文听力'}],
+    6:[{id:'vocabreview',name:'词汇复习',time:'30min',detail:'本周100词全面复习，艾宾浩斯法'},{id:'listeningmock',name:'听力模拟',time:'30min',detail:'听力页面完成1套听力模拟'}],
+    7:[{id:'mockexam',name:'模拟卷(AI生成)',time:'60min',detail:'前往模拟页面，AI生成1套完整模拟卷'},{id:'grading',name:'批改订正',time:'15min',detail:'错题查看错题本，复习注释讲解'},{id:'vocabreview',name:'词汇复习',time:'15min',detail:'本周错词重点复习'}]
+  },
+  '7b': {
+    1:[{id:'vocab',name:'词汇背诵',time:'25min',detail:'在线获取7B考纲词汇20个'},{id:'reading',name:'课文精读',time:'10min',detail:'在线获取沪教版七上课文'},{id:'cloze',name:'完形填空',time:'10min',detail:'AI生成今日完形填空1篇'},{id:'listening',name:'听力训练',time:'10min',detail:'听力页面跟读课文音频'}],
+    2:[{id:'vocab',name:'词汇复习',time:'25min',detail:'艾宾浩斯复习+新词20个'},{id:'reading',name:'课文精读',time:'10min',detail:'继续精读'},{id:'cloze',name:'完形填空',time:'10min',detail:'AI生成今日完形填空1篇'},{id:'listening',name:'听力训练',time:'10min',detail:'影子跟读'}],
+    3:[{id:'vocab',name:'词汇背诵',time:'25min',detail:'在线获取新词20个+复习'},{id:'reading',name:'课文精读',time:'10min',detail:'在线获取沪教版七上课文'},{id:'cloze',name:'完形填空',time:'10min',detail:'AI生成今日完形填空1篇'},{id:'listening',name:'听力训练',time:'10min',detail:'跟读+复述'}],
+    4:[{id:'vocab',name:'词汇复习',time:'25min',detail:'艾宾浩斯复习+新词20个'},{id:'reading',name:'课文精读',time:'10min',detail:'继续精读'},{id:'cloze',name:'完形填空',time:'10min',detail:'AI生成今日完形填空1篇'},{id:'listening',name:'听力训练',time:'10min',detail:'听力页面完成1篇对话听力'}],
+    5:[{id:'vocab',name:'词汇背诵',time:'25min',detail:'复习+新词20个，周累计100词'},{id:'reading',name:'课文精读',time:'10min',detail:'本周课文回顾'},{id:'cloze',name:'完形填空',time:'10min',detail:'AI生成今日完形填空1篇'},{id:'listening',name:'听力训练',time:'10min',detail:'听力页面完成1篇短文听力'}],
+    6:[{id:'vocabreview',name:'词汇复习',time:'30min',detail:'本周100词全面复习，艾宾浩斯法'},{id:'listeningmock',name:'听力模拟',time:'30min',detail:'听力页面完成1套听力模拟'}],
+    7:[{id:'mockexam',name:'模拟卷(AI生成)',time:'60min',detail:'前往模拟页面，AI生成1套完整模拟卷'},{id:'grading',name:'批改订正',time:'15min',detail:'错题查看错题本，复习注释讲解'},{id:'vocabreview',name:'词汇复习',time:'15min',detail:'本周错词重点复习'}]
+  }
+};
+const WEEKDAYS=['日','一','二','三','四','五','六'];
+const WEEKDAY_FULL=['周日','周一','周二','周三','周四','周五','周六'];
+
+// ==================== UTILITIES ====================
+function getDayOfWeek(){return new Date().getDay();}
+function getTodayTasks(){if(!data.tasks[getTodayStr()])data.tasks[getTodayStr()]={};return data.tasks[getTodayStr()];}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._timer);t._timer=setTimeout(()=>t.classList.remove('show'),2000);}
+function showLoading(text,sub){document.getElementById('loading-text').textContent=text||'加载中...';document.getElementById('loading-sub').textContent=sub||'';document.getElementById('loading-overlay').classList.remove('hidden');}
+function hideLoading(){document.getElementById('loading-overlay').classList.add('hidden');}
+function showModal(html){document.getElementById('modal-content').innerHTML=html;document.getElementById('modal-overlay').classList.add('show');}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('show');}
+document.getElementById('modal-overlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+// ==================== SPEECH SYNTHESIS ====================
+let speechSynth=window.speechSynthesis||null;
+let speechRate=0.8;
+function speak(text,opts){if(!speechSynth){showToast('当前浏览器不支持语音播放');return;}speechSynth.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='en-US';u.rate=opts&&opts.rate?opts.rate:speechRate;u.pitch=1;if(opts&&opts.onend)u.onend=opts.onend;speechSynth.speak(u);}
+function stopSpeak(){if(speechSynth)speechSynth.cancel();}
+
+// ==================== SPACED REPETITION ====================
+const REVIEW_INTERVALS=[1,2,4,7,15,30];
+function getNextReviewDate(stage){const days=REVIEW_INTERVALS[Math.min(stage,REVIEW_INTERVALS.length-1)];const d=new Date();d.setDate(d.getDate()+days);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function getWordsForReview(){const today=getTodayStr();return data.fetchedWords.filter(w=>{const p=data.vocabProgress[w.en];return p&&p.nextReview<=today&&p.stage<5;});}
+function advanceWordStage(word,known){const p=data.vocabProgress[word];if(!p)return;if(known){p.stage=Math.min(5,p.stage+1);p.nextReview=getNextReviewDate(p.stage);p.known=p.stage>=4;}else{p.stage=Math.max(0,p.stage-1);p.nextReview=getNextReviewDate(0);p.known=false;}p.lastReview=getTodayStr();saveData();}
+
+// ==================== ERROR BOOK ====================
+function addError(type, question, correctAns, userAns, explanation) {
+  if (userAns === undefined || userAns === null) return;
+  if (userAns === correctAns) return;
+  data.errorBook.push({
+    type, question, correctAns, userAns, explanation,
+    date: getTodayStr(), mastered: false,
+    timestamp: Date.now()
+  });
+  saveData();
+}
+
+function renderErrorBook(filter) {
+  const list = document.getElementById('error-list');
+  const errors = filter && filter !== 'all' ? data.errorBook.filter(e => e.type === filter) : data.errorBook;
+  
+  document.getElementById('err-total').textContent = data.errorBook.length;
+  document.getElementById('err-mastered').textContent = data.errorBook.filter(e => e.mastered).length;
+  document.getElementById('error-count-text').textContent = `共 ${data.errorBook.length} 题`;
+
+  const filters = ['all','listening','cloze','mock'];
+  const filterLabels = {all:'全部',listening:'听力',cloze:'完形',mock:'模拟卷'};
+  document.getElementById('error-filters').innerHTML = filters.map(f => 
+    `<button class="speed-btn ${(!filter||filter===f)?'active':''}" onclick="renderErrorBook('${f}')">${filterLabels[f]} (${f==='all'?data.errorBook.length:data.errorBook.filter(e=>e.type===f).length})</button>`
+  ).join('');
+
+  if (errors.length === 0) {
+    list.innerHTML = '<div class="empty-state">暂无错题<br>继续练习，错题会自动收集到这里</div>';
+    return;
+  }
+
+  const typeLabels = {listening:'听力',cloze:'完形填空',mock:'模拟卷',grammar:'语法',vocab:'词汇',reading:'阅读'};
+  const typeClasses = {listening:'ei-type-listening',cloze:'ei-type-cloze',mock:'ei-type-mock',grammar:'ei-type-grammar',vocab:'ei-type-vocab',reading:'ei-type-reading'};
+
+  list.innerHTML = errors.slice().reverse().map((e, i) => {
+    const idx = data.errorBook.indexOf(e);
+    return `
+      <div class="error-item">
+        <span class="ei-type ${typeClasses[e.type]||'ei-type-mock'}">${typeLabels[e.type]||e.type}</span>
+        <div class="ei-question">${e.question}</div>
+        <div class="ei-answers">
+          <div class="ei-correct">✓ 正确：${e.correctAns}</div>
+          <div class="ei-wrong">✗ 你的答案：${e.userAns}</div>
+        </div>
+        <div class="ei-explanation">📝 ${e.explanation}</div>
+        <div class="ei-date">${e.date}</div>
+        <div style="display:flex;gap:0.5rem;margin-top:0.4rem">
+          <span class="ei-del" onclick="toggleMastered(${idx})">${e.mastered?'取消掌握':'标记已掌握'}</span>
+          <span class="ei-del" onclick="deleteError(${idx})">删除</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleMastered(idx) {
+  if (!data.errorBook[idx]) return;
+  data.errorBook[idx].mastered = !data.errorBook[idx].mastered;
+  saveData();
+  renderErrorBook();
+  showToast(data.errorBook[idx].mastered ? '已标记为掌握' : '已取消掌握');
+}
+
+function deleteError(idx) {
+  data.errorBook.splice(idx, 1);
+  saveData();
+  renderErrorBook();
+  showToast('已删除');
+}
+
+function clearAllErrors() {
+  if (data.errorBook.length === 0) { showToast('错题本为空'); return; }
+  showModal(`
+    <h3>清空错题本</h3>
+    <p>确定要清空全部 ${data.errorBook.length} 道错题吗？此操作不可撤销。</p>
+    <button class="btn btn-primary" onclick="doClearErrors()">确定清空</button>
+    <button class="btn btn-outline" onclick="closeModal()">取消</button>
+  `);
+}
+
+function doClearErrors() {
+  data.errorBook = [];
+  saveData();
+  closeModal();
+  renderErrorBook();
+  showToast('错题本已清空');
+}
+
+// ==================== AUTO-COMPLETE ====================
+function autoCompleteTask(taskId) {
+  const tasks = getTodayTasks();
+  if (!tasks[taskId]) {
+    tasks[taskId] = true;
+    saveData();
+    renderToday();
+    const sem = data.semester;
+    const plan = PLANS[sem][getDayOfWeek()] || [];
+    const task = plan.find(t => t.id === taskId);
+    if (task) showToast(`✓ ${task.name} 自动完成！`);
+    checkAllDone();
+  }
+}
+
+function checkVocabCompletion() {
+  const today = getTodayStr();
+  const count = data.vocabToday[today] || 0;
+  if (count >= 20) {
+    const tasks = getTodayTasks();
+    if (!tasks['vocab'] && !tasks['vocabreview']) {
+      const dow = getDayOfWeek();
+      const plan = PLANS[data.semester][dow] || [];
+      const vocabTask = plan.find(t => t.id === 'vocab' || t.id === 'vocabreview');
+      if (vocabTask) autoCompleteTask(vocabTask.id);
+    }
+  }
+}
+
+// ==================== PAGE: TODAY ====================
+function renderToday() {
+  const today = new Date();
+  const dow = today.getDay();
+  document.getElementById('today-weekday').textContent = WEEKDAY_FULL[dow];
+  document.getElementById('today-date').textContent = `${today.getMonth()+1}月${today.getDate()}日`;
+
+  const sem = data.semester;
+  const enPlan = PLANS[sem][dow] || [];
+  const tasks = getTodayTasks();
+
+  const container = document.getElementById('en-tasks');
+  container.innerHTML = enPlan.map(task => {
+    const done = tasks[task.id];
+    const hasAction = ['vocab','vocabreview','listeningmock','mockexam','listening','cloze','reading'].includes(task.id);
+    const actionLabel = {vocab:'去背词',vocabreview:'去复习',listeningmock:'去听力',mockexam:'去模拟',listening:'去听力',cloze:'去完形',reading:'去阅读'}[task.id]||'';
+    return `
+      <div class="task-card en ${done?'done':''}" onclick="goToActionPage('${task.id}')">
+        <div class="task-check"></div>
+        <div class="task-body">
+          <div class="task-name">${task.name}</div>
+          <div class="task-detail">${task.detail}</div>
+        </div>
+        <div class="task-time">${task.time}</div>
+        ${hasAction ? `<button class="task-action" onclick="event.stopPropagation();goToActionPage('${task.id}')">${actionLabel}</button>` : ''}
+      </div>`;
+  }).join('');
+
+  const todayVocab = data.vocabToday[getTodayStr()] || 0;
+  document.getElementById('vocab-today').textContent = todayVocab;
+  document.getElementById('vocab-total-sub').textContent = `累计 ${data.fetchedWords.length} 词`;
+
+  updateProgress();
+  updateStreak();
+  updateCheckInUI();
+  checkReminder();
+}
+
+function goToActionPage(taskId) {
+  if (taskId === 'vocab' || taskId === 'vocabreview') switchPage('vocab');
+  else if (taskId === 'listeningmock' || taskId === 'listening') switchPage('listening');
+  else if (taskId === 'mockexam') switchPage('mock');
+  else if (taskId === 'cloze') switchPage('cloze');
+  else if (taskId === 'reading') openTextbook();
+}
+
+function toggleTask(taskId) {
+  const tasks = getTodayTasks();
+  tasks[taskId] = !tasks[taskId];
+  saveData();
+  renderToday();
+  renderStats();
+}
+
+function checkAllDone() {
+  const dow = getDayOfWeek();
+  const enPlan = PLANS[data.semester][dow] || [];
+  const tasks = getTodayTasks();
+  const allDone = enPlan.every(t => tasks[t.id]);
+  if (allDone) setTimeout(() => showToast('🎉 今日全部完成！太棒了！'), 500);
+}
+
+function updateProgress() {
+  const dow = getDayOfWeek();
+  const enPlan = PLANS[data.semester][dow] || [];
+  const tasks = getTodayTasks();
+  const doneCount = enPlan.filter(t => tasks[t.id]).length;
+  const total = enPlan.length;
+  const ring = document.getElementById('ring-fg');
+  const circumference = 188.5;
+  const offset = total > 0 ? circumference - (doneCount / total) * circumference : circumference;
+  ring.style.strokeDashoffset = offset;
+  document.getElementById('ring-text').textContent = `${doneCount}/${total}`;
+  const remaining = total - doneCount;
+  document.getElementById('progress-text').textContent = remaining > 0 ? `还有 ${remaining} 项待完成` : '全部完成！🎉';
+  document.getElementById('progress-sub').textContent = '每日约60分钟英语训练';
+}
+
+function updateStreak() {
+  let streak = 0;
+  for (let i = 0; i < 365; i++) {
+    const ds = getDateStr(-i);
+    const dt = data.tasks[ds];
+    if (!dt) break;
+    if (!Object.values(dt).some(v => v)) break;
+    streak++;
+  }
+  data.streak = streak;
+  if (streak > 0) { document.getElementById('streak-badge').style.display='flex'; document.getElementById('streak-num').textContent=streak; }
+  else { document.getElementById('streak-badge').style.display='none'; }
+  saveData();
+}
+
+function adjustVocab(delta) {
+  const today = getTodayStr();
+  if (!data.vocabToday[today]) data.vocabToday[today] = 0;
+  data.vocabToday[today] = Math.max(0, data.vocabToday[today] + delta);
+  document.getElementById('vocab-today').textContent = data.vocabToday[today];
+  document.getElementById('vocab-total-sub').textContent = `累计 ${data.fetchedWords.length} 词`;
+  saveData();
+  if (delta > 0) showToast(`+${delta} 词！今日已背 ${data.vocabToday[today]} 词`);
+  checkVocabCompletion();
+}
+
+// ==================== CHECK-IN ====================
+function checkIn() {
+  const today = getTodayStr();
+  if (!data.checkIns) data.checkIns = {};
+  if (data.checkIns[today]) { showToast('今天已经打卡了！'); return; }
+  data.checkIns[today] = new Date().toISOString();
+  let streak = 0;
+  for (let i = 0; i < 365; i++) { const ds = getDateStr(-i); if (data.checkIns[ds]) streak++; else break; }
+  data.checkInStreak = streak;
+  saveData();
+  updateCheckInUI();
+  renderStats();
+  const msgs = ['打卡成功！加油！','又坚持了一天！','你是最棒的！','坚持就是胜利！','英语高手在路上！'];
+  showToast(`${msgs[Math.floor(Math.random()*msgs.length)]} 连续${streak}天`);
+}
+
+function updateCheckInUI() {
+  const today = getTodayStr();
+  const checkedIn = data.checkIns && data.checkIns[today];
+  const btn = document.getElementById('check-in-btn');
+  const sub = document.getElementById('check-in-streak-text');
+  if (checkedIn) { btn.textContent='已打卡 ✓'; btn.classList.add('done'); }
+  else { btn.textContent='立即打卡'; btn.classList.remove('done'); }
+  sub.textContent = `连续打卡 ${data.checkInStreak || 0} 天`;
+}
+
+function scrollToCheckIn() { document.querySelector('.check-in-area').scrollIntoView({behavior:'smooth'}); }
+
+// ==================== REMINDER ====================
+function checkReminder() {
+  if (!data.reminder || !data.reminder.enabled) { document.getElementById('reminder-banner').style.display='none'; return; }
+  const now = new Date();
+  const [h,m] = (data.reminder.time||'19:00').split(':').map(Number);
+  const rt = new Date(); rt.setHours(h,m,0,0);
+  const today = getTodayStr();
+  const checkedIn = data.checkIns && data.checkIns[today];
+  const tasks = getTodayTasks();
+  const hasDoneAny = Object.values(tasks).some(v => v);
+  if (now >= rt && !checkedIn) {
+    document.getElementById('reminder-banner').style.display='flex';
+    document.getElementById('reminder-text').textContent = hasDoneAny ? '继续完成今天的训练吧！记得打卡~' : '该开始今天的英语训练了！记得打卡~';
+    if ('Notification' in window && Notification.permission === 'granted' && data.lastNotifyDate !== today) {
+      new Notification('英语每日训练', {body:'该打卡训练了！今天还没有完成英语训练哦~'});
+      data.lastNotifyDate = today; saveData();
+    }
+  } else { document.getElementById('reminder-banner').style.display='none'; }
+}
+function updateReminderTime() { if(!data.reminder)data.reminder={};data.reminder.time=document.getElementById('reminder-time').value;saveData();showToast(`提醒时间已设为 ${data.reminder.time}`);checkReminder();}
+function toggleReminder() { if(!data.reminder)data.reminder={time:'19:00',enabled:true};data.reminder.enabled=!data.reminder.enabled;document.getElementById('reminder-toggle').classList.toggle('on',data.reminder.enabled);saveData();showToast(data.reminder.enabled?'提醒已开启':'提醒已关闭');checkReminder();}
+function requestNotifyPermission() { if(!('Notification' in window)){showToast('当前浏览器不支持通知');return;}Notification.requestPermission().then(p=>{if(p==='granted'){document.getElementById('notify-btn').textContent='已开启 ✓';document.getElementById('notify-btn').style.opacity='0.6';new Notification('英语每日训练',{body:'通知已开启！每天提醒你打卡训练~'});}else{showToast('通知权限被拒绝');}});}
+
+// ==================== PAGE: VOCAB ====================
+let currentCardIndex = 0;
+let reviewQueue = [];
+
+function renderVocab() {
+  const total = getSyllabusVocab().length;
+  document.getElementById('vocab-progress-text').textContent = `已学 ${data.fetchedWords.length} / ${total} 词`;
+  const newWords = getNewWords();
+  const btn = document.getElementById('fetch-vocab-btn');
+  if (newWords.length === 0) { btn.textContent='✓ 考纲词汇已全部获取'; btn.disabled=true; }
+  else { btn.textContent=`📡 从考纲在线获取今日词汇（剩余${newWords.length}词）`; btn.disabled=false; }
+  renderFlashcard();
+  renderVocabList();
+  const reviewWords = getWordsForReview();
+  document.getElementById('review-status').textContent = `待复习 ${reviewWords.length} 词`;
+}
+
+async function fetchTodayVocab() {
+  const newWords = getNewWords();
+  if (newWords.length === 0) { showToast('考纲词汇已全部获取！'); return; }
+  showLoading('正在从考纲获取词汇...', '连接在线词库');
+  await new Promise(r => setTimeout(r, 800));
+  const count = Math.min(20, newWords.length);
+  const fetched = newWords.slice(0, count);
+  showLoading('正在从考纲获取词汇...', `获取 ${count} 个新词`);
+  for (const w of fetched) {
+    if (!data.vocabProgress[w[0]]) {
+      data.vocabProgress[w[0]] = {en:w[0],cn:w[1],unit:w[2],stage:0,lastReview:null,nextReview:getTodayStr(),known:false,phonetic:'',fetchedAt:getTodayStr()};
+      data.fetchedWords.push({en:w[0],cn:w[1],unit:w[2]});
+    }
+  }
+  const today = getTodayStr();
+  if (!data.vocabToday[today]) data.vocabToday[today] = 0;
+  data.vocabToday[today] += count;
+  saveData();
+  hideLoading();
+  showToast(`成功获取 ${count} 个考纲词汇！今日已背 ${data.vocabToday[today]} 词`);
+  renderVocab();
+  document.getElementById('vocab-today').textContent = data.vocabToday[today];
+  document.getElementById('vocab-total-sub').textContent = `累计 ${data.fetchedWords.length} 词`;
+  checkVocabCompletion();
+}
+
+function buildReviewQueue() {
+  const today = getTodayStr();
+  const newToday = data.fetchedWords.filter(w => { const p = data.vocabProgress[w.en]; return p && p.stage === 0 && p.nextReview <= today; });
+  const review = getWordsForReview();
+  reviewQueue = [...newToday, ...review];
+}
+
+function renderFlashcard() {
+  buildReviewQueue();
+  const container = document.getElementById('flashcard-container');
+  const controls = document.getElementById('flashcard-controls');
+  if (reviewQueue.length === 0) { container.innerHTML='<div class="flashcard-empty">暂无待复习词汇<br>点击上方按钮获取今日新词</div>'; controls.style.display='none'; return; }
+  if (currentCardIndex >= reviewQueue.length) currentCardIndex = 0;
+  const word = reviewQueue[currentCardIndex];
+  const prog = data.vocabProgress[word.en];
+  const phonetic = prog && prog.phonetic ? prog.phonetic : '';
+  container.innerHTML = `<div class="flashcard" id="flashcard" onclick="flipCard()"><div class="flashcard-inner"><div class="flashcard-front"><div class="word">${word.en}</div>${phonetic?`<div class="phonetic">${phonetic}</div>`:''}<div class="hint">点击翻面 · ${currentCardIndex+1}/${reviewQueue.length}</div></div><div class="flashcard-back"><div class="meaning">${word.cn}</div><div class="hint">认识？</div></div></div></div>`;
+  controls.style.display = 'flex';
+}
+function flipCard() { const c=document.getElementById('flashcard'); if(c)c.classList.toggle('flipped'); }
+function speakCurrentWord() { const w=reviewQueue[currentCardIndex]; if(w)speak(w.en,{rate:0.7}); }
+function reviewCard(known) {
+  const word = reviewQueue[currentCardIndex];
+  if (!word) return;
+  advanceWordStage(word.en, known);
+  if (known) showToast(`认识！阶段 ${data.vocabProgress[word.en].stage}/5`);
+  else showToast('再接再厉，多复习几遍');
+  currentCardIndex++;
+  if (currentCardIndex >= reviewQueue.length) { currentCardIndex=0; showToast('🎉 一轮复习完成！'); }
+  renderFlashcard();
+  renderVocab();
+  renderStats();
+}
+
+function renderVocabList() {
+  const list = document.getElementById('vocab-list');
+  document.getElementById('vocab-list-count').textContent = `${data.fetchedWords.length} 词`;
+  if (data.fetchedWords.length === 0) { list.innerHTML='<div class="empty-state">还没有词汇<br>点击上方按钮从考纲获取</div>'; return; }
+  list.innerHTML = data.fetchedWords.map(w => {
+    const prog = data.vocabProgress[w.en] || {stage:0};
+    return `<div class="vocab-list-item">
+      <div>
+        <span class="en-word" onclick="speakVocabWord('${w.en}')">${w.en}</span>
+        <span class="cn-word"> — ${w.cn}</span>
+        <span class="speak-icon" onclick="speakVocabWord('${w.en}')">🔊</span>
+      </div>
+      <span class="stage-badge stage-${prog.stage}">${['新','学','熟','固','通','精'][prog.stage]}</span>
+    </div>`;
+  }).join('');
+}
+
+function speakVocabWord(word) { speak(word, {rate:0.7}); }
+
+// ==================== TEXTBOOK READER (课文精读) ====================
+let selectedTextbookUnit = -1;
+
+function openTextbook() {
+  document.getElementById('tb-title').textContent = '课文精读';
+  const selector = document.getElementById('tb-unit-selector');
+  selector.innerHTML = TEXTBOOK_UNITS.map((u, i) =>
+    `<button class="speed-btn" style="padding:0.4rem;font-size:0.75rem" onclick="selectTextbookUnit(${i})">U${u.unit}</button>`
+  ).join('');
+  document.getElementById('tb-action-bar').style.display = 'none';
+  document.getElementById('tb-content').style.display = 'none';
+  document.getElementById('tb-content').innerHTML = '';
+  document.getElementById('textbook-overlay').classList.add('show');
+}
+
+function selectTextbookUnit(idx) {
+  const unit = TEXTBOOK_UNITS[idx];
+  document.getElementById('tb-title').textContent = unit.title;
+  let passageHtml = unit.passage;
+  unit.vocab.forEach(v => {
+    const re = new RegExp('\\b' + v[0] + '\\b', 'gi');
+    passageHtml = passageHtml.replace(re, '<span class="clickable-word" onclick="showWordPopup(\'' + v[0] + '\',\'' + v[1] + '\',event)">' + v[0] + '</span>');
+  });
+  document.getElementById('tb-content').innerHTML = '<h3>' + unit.title + '</h3><div class="tb-passage">' + passageHtml + '</div><div class="tb-vocab"><h4>重点词汇（点击发音）</h4>' + unit.vocab.map(function(v) { return '<div class="tb-vocab-item"><span class="tb-en" onclick="speak(\'' + v[0] + '\',{rate:0.7})">' + v[0] + '</span><span>' + v[1] + '</span></div>'; }).join('') + '</div>';
+  document.getElementById('tb-content').style.display = 'block';
+  document.getElementById('tb-action-bar').style.display = 'block';
+  document.querySelectorAll('#tb-unit-selector .speed-btn').forEach(function(b, i) { b.classList.toggle('active', i === idx); });
+  selectedTextbookUnit = idx;
+}
+
+function finishTextbook() {
+  if (selectedTextbookUnit < 0) { showToast('请先选择一个单元'); return; }
+  autoCompleteTask('reading');
+  data.textbookRead[getTodayStr()] = true;
+  saveData();
+  showToast('课文精读已完成！');
+  closeTextbook();
+}
+
+function closeTextbook() {
+  document.getElementById('textbook-overlay').classList.remove('show');
+  stopSpeak();
+}
+
+function speakTextbook() {
+  const passage = document.querySelector('.tb-passage');
+  if (passage) {
+    const text = passage.textContent;
+    speak(text, {rate:0.75});
+  }
+}
+
+// ==================== WORD POPUP ====================
+let popupWord = '';
+function showWordPopup(word, def, event) {
+  event.stopPropagation();
+  popupWord = word;
+  document.getElementById('wp-word').textContent = word;
+  document.getElementById('wp-def').textContent = def;
+  document.getElementById('wp-phonetic').textContent = '';
+  
+  const popup = document.getElementById('word-popup');
+  const rect = event.target.getBoundingClientRect();
+  let left = rect.left;
+  let top = rect.bottom + 8;
+  if (left + 280 > window.innerWidth) left = window.innerWidth - 290;
+  if (top + 150 > window.innerHeight) top = rect.top - 150;
+  popup.style.left = left + 'px';
+  popup.style.top = top + 'px';
+  popup.classList.add('show');
+  
+  fetchWordDetails(word).then(details => {
+    if (details && details.phonetic) {
+      document.getElementById('wp-phonetic').textContent = details.phonetic;
+    }
+    if (details && details.definition) {
+      document.getElementById('wp-def').innerHTML = def + '<br><span style="color:var(--muted);font-size:0.75rem">' + details.definition.substring(0,100) + '</span>';
+    }
+  });
+  
+  setTimeout(() => { popup.classList.remove('show'); }, 5000);
+}
+
+function speakPopupWord() { if (popupWord) speak(popupWord, {rate:0.7}); }
+
+document.addEventListener('click', function(e) {
+  const popup = document.getElementById('word-popup');
+  if (!e.target.closest('.clickable-word') && !e.target.closest('#word-popup')) {
+    popup.classList.remove('show');
+  }
+});
+
+// ==================== DICTIONARY API ====================
+async function fetchWordDetails(word) {
+  try {
+    const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+    if (res.ok) {
+      const data = await res.json();
+      const entry = data[0];
+      const phonetic = entry.phonetic || (entry.phonetics && entry.phonetics.find(p => p.text) ? entry.phonetics.find(p => p.text).text : '');
+      const definition = entry.meanings && entry.meanings[0] && entry.meanings[0].definitions ? entry.meanings[0].definitions[0].definition : '';
+      return { phonetic, definition };
+    }
+  } catch(e) {}
+  return null;
+}
+
+// ==================== PAGE: LISTENING ====================
+let currentListeningEx = null;
+let currentListeningItem = 0;
+let listeningAnswers = {};
+
+function renderListeningList() {
+  const container = document.getElementById('listening-exercise-list');
+  const todays = getTodayListening();
+  const allEx = [...todays.shorts, todays.mock];
+  const done = getTodayListeningDone();
+  const completedCount = allEx.filter(e => done[e.id]).length;
+  let header = '<div style="background:var(--white);border-radius:var(--radius);padding:0.75rem 1rem;margin-bottom:0.75rem;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center"><span style="font-size:0.85rem;font-weight:700">今日听力（'+completedCount+'/'+allEx.length+'）</span><span style="font-size:0.75rem;color:'+(completedCount===allEx.length?'var(--green)':'var(--muted)')+'">'+(completedCount===allEx.length?'全部完成！':'需全部完成')+'</span></div>';
+  container.innerHTML = header + allEx.map((ex, i) => {
+    const isDone = done[ex.id];
+    const isMock = ex.id === 'mock';
+    const tagLabel = isMock ? '综合模拟' : '短文';
+    const itemCount = ex.questions ? ex.questions.length : 0;
+    return '<div class="exercise-card '+(isDone?'ex-card-done':'')+'" onclick="openListeningEx(\''+ex.id+'\')"><div class="ex-title">'+(i+1)+'. '+ex.title+'</div><div class="ex-info"><span class="ex-tag ex-tag-passage">'+tagLabel+'</span><span>'+ex.level+'</span><span>'+itemCount+'题</span>'+(isDone?'<span style="color:var(--green)">✓ 已完成</span>':'')+'</div></div>';
+  }).join('');
+}
+
+function openListeningEx(exId) {
+  const todays = getTodayListening();
+  const allEx = [...todays.shorts, todays.mock];
+  const ex = allEx.find(e => e.id === exId);
+  if (!ex) return;
+  currentListeningEx = ex;
+  currentListeningItem = 0;
+  listeningAnswers = {};
+  document.getElementById('listening-exercise-list').style.display = 'none';
+  document.getElementById('listening-exercise-detail').style.display = 'block';
+  renderListeningDetail();
+}
+
+function renderListeningDetail() {
+  if (!currentListeningEx) return;
+  const ex = currentListeningEx;
+  const detail = document.getElementById('listening-exercise-detail');
+  let html = `<div class="top-bar"><div class="date-block"><div class="weekday" style="font-size:1.1rem;cursor:pointer" onclick="backToListeningList()">← 返回</div><div class="date">${ex.title}</div></div></div>
+    <div class="player-area">
+      <div style="font-size:0.85rem;color:var(--muted);margin-bottom:0.5rem">在线播放（浏览器语音引擎）</div>
+      <div class="speed-control">
+        <button class="speed-btn ${speechRate===0.5?'active':''}" onclick="setRate(0.5)">0.5x</button>
+        <button class="speed-btn ${speechRate===0.75?'active':''}" onclick="setRate(0.75)">0.75x</button>
+        <button class="speed-btn ${speechRate===1?'active':''}" onclick="setRate(1)">1.0x</button>
+        <button class="speed-btn ${speechRate===1.25?'active':''}" onclick="setRate(1.25)">1.25x</button>
+      </div>
+      <div class="player-controls">
+        <button class="player-btn sm" onclick="replayListening()">↩</button>
+        <button class="player-btn play" onclick="playListening()">▶</button>
+        <button class="player-btn sm" onclick="stopSpeak()">⏹</button>
+      </div>
+      <div class="player-hint" id="player-hint">点击播放按钮开始</div>
+    </div>`;
+  
+  if (ex.type === 'dialogue') {
+    html += `<div class="question-block"><div class="q-text" style="margin-bottom:0.5rem">对话内容：</div><div id="dialogue-text" style="display:none;font-size:0.82rem;line-height:1.8;margin-bottom:0.75rem"></div><button class="btn btn-outline btn-block" onclick="toggleDialogueText()" id="toggle-text-btn">查看原文</button></div><div id="dialogue-questions"></div>`;
+  } else {
+    html += `<div class="question-block"><div class="q-text" style="margin-bottom:0.5rem">短文原文：</div><div id="passage-text" style="display:none;font-size:0.82rem;line-height:1.8;margin-bottom:0.75rem"></div><button class="btn btn-outline btn-block" onclick="togglePassageText()" id="toggle-text-btn">查看原文</button></div><div id="passage-questions"></div>`;
+  }
+  
+  html += `<button class="btn btn-primary btn-block" style="margin-top:0.75rem" onclick="submitListening()">提交答案</button><button class="btn btn-outline btn-block" style="margin-top:0.4rem" onclick="backToListeningList()">返回列表</button>`;
+  detail.innerHTML = html;
+  
+  if (ex.type === 'dialogue') renderDialogueQuestions();
+  else renderPassageQuestions();
+}
+
+function setRate(rate) {
+  speechRate = rate;
+  document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+function playListening() {
+  if (!currentListeningEx) return;
+  const ex = currentListeningEx;
+  let text = '';
+  if (ex.type === 'dialogue') {
+    text = ex.dialogue.map(d => d.t).join('. ');
+    document.getElementById('player-hint').textContent = '正在播放对话...';
+  } else {
+    text = ex.passage;
+    document.getElementById('player-hint').textContent = '正在播放短文...';
+  }
+  speak(text, { rate: speechRate, onend: () => { document.getElementById('player-hint').textContent = '播放完毕'; } });
+}
+
+function replayListening() { playListening(); }
+
+function toggleDialogueText() {
+  const el = document.getElementById('dialogue-text');
+  const btn = document.getElementById('toggle-text-btn');
+  if (el.style.display === 'none') {
+    el.innerHTML = currentListeningEx.dialogue.map(d => `<div><strong>${d.s}:</strong> ${d.t}</div>`).join('');
+    el.style.display = 'block'; btn.textContent = '隐藏原文';
+  } else { el.style.display = 'none'; btn.textContent = '查看原文'; }
+}
+
+function renderDialogueQuestions() {
+  const ex = currentListeningEx;
+  document.getElementById('dialogue-questions').innerHTML = ex.questions.map((q, i) =>
+    `<div class="question-block" id="dq-${i}"><div class="q-text"><span class="q-num">${i+1}.</span>${q.q}</div>${q.o.map((opt, j) => `<div class="option-row" onclick="selectOption('dq-${i}',${j})"><div class="option-letter">${'ABCD'[j]}</div><span>${opt}</span></div>`).join('')}</div>`
+  ).join('');
+}
+
+function togglePassageText() {
+  const el = document.getElementById('passage-text');
+  const btn = document.getElementById('toggle-text-btn');
+  if (el.style.display === 'none') { el.textContent = currentListeningEx.passage; el.style.display = 'block'; btn.textContent = '隐藏原文'; }
+  else { el.style.display = 'none'; btn.textContent = '查看原文'; }
+}
+
+function renderPassageQuestions() {
+  const ex = currentListeningEx;
+  document.getElementById('passage-questions').innerHTML = ex.questions.map((q, i) =>
+    `<div class="question-block" id="pq-${i}"><div class="q-text"><span class="q-num">${i+1}.</span>${q.q}</div>${q.o.map((opt, j) => `<div class="option-row" onclick="selectOption('pq-${i}',${j})"><div class="option-letter">${'ABCD'[j]}</div><span>${opt}</span></div>`).join('')}</div>`
+  ).join('');
+}
+
+function selectOption(qid, optIdx) {
+  const block = document.getElementById(qid);
+  block.querySelectorAll('.option-row').forEach(r => r.classList.remove('selected'));
+  block.querySelectorAll('.option-row')[optIdx].classList.add('selected');
+  listeningAnswers[qid] = optIdx;
+}
+
+function submitListening() {
+  if (!currentListeningEx) return;
+  const ex = currentListeningEx;
+  let correct = 0;
+  const total = ex.questions.length;
+  const prefix = ex.type === 'dialogue' ? 'dq' : 'pq';
+  
+  ex.questions.forEach((q, i) => {
+    const qid = `${prefix}-${i}`;
+    const userAns = listeningAnswers[qid];
+    const block = document.getElementById(qid);
+    if (!block) return;
+    const options = block.querySelectorAll('.option-row');
+    options.forEach((opt, j) => {
+      opt.classList.remove('selected');
+      if (j === q.a) opt.classList.add('correct');
+      else if (j === userAns) opt.classList.add('wrong');
+      opt.style.pointerEvents = 'none';
+    });
+    if (userAns === q.a) correct++;
+    else {
+      addError('listening', `${i+1}. ${q.q}`, q.o[q.a], q.o[userAns] || '未作答', `正确答案：${q.o[q.a]}。${q.e || ''}`);
+    }
+  });
+  
+  getTodayListeningDone()[ex.id] = true;
+  saveData();
+  
+  showModal(`<h3>听力练习完成</h3><div class="score-display"><div class="score-num">${correct}</div><div class="score-total">/${total}</div><div class="score-label">正确率 ${Math.round(correct/total*100)}%</div></div><p>错题已自动加入错题本</p><button class="btn btn-primary" onclick="finishListening()">确定</button>`);
+}
+
+function finishListening() {
+  closeModal();
+  listeningAnswers = {};
+  checkListeningAllDone();
+  backToListeningList();
+  renderStats();
+  renderErrorBook();
+  renderListeningList();
+  showToast('听力练习已完成！');
+}
+
+function backToListeningList() {
+  stopSpeak();
+  currentListeningEx = null;
+  document.getElementById('listening-exercise-detail').style.display = 'none';
+  document.getElementById('listening-exercise-list').style.display = 'block';
+  renderListeningList();
+}
+
+// ==================== PAGE: CLOZE (完形填空) ====================
+let currentCloze = null;
+let clozeAnswers = {};
+
+async function generateDailyCloze() {
+  showLoading('AI正在生成完形填空...', '适配七年级中考水平');
+  await new Promise(r => setTimeout(r, 1200));
+  
+  const today = getTodayStr();
+  const usedIndices = data.clozeHistory.map(h => h.index);
+  let available = CLOZE_BANK.map((_, i) => i).filter(i => !usedIndices.includes(i));
+  if (available.length === 0) { available = CLOZE_BANK.map((_, i) => i); }
+  const idx = available[Math.floor(Math.random() * available.length)];
+  const cloze = CLOZE_BANK[idx];
+  
+  const blanks = JSON.parse(JSON.stringify(cloze.blanks));
+  blanks.forEach(b => {
+    const correct = b.o[b.a];
+    b.o = [...b.o].sort(() => Math.random() - 0.5);
+    b.a = b.o.indexOf(correct);
+  });
+  
+  currentCloze = { ...cloze, blanks, originalIndex: idx };
+  clozeAnswers = {};
+  
+  hideLoading();
+  renderClozeExam();
+  showToast('完形填空已生成！点击文章中生词可查释义');
+}
+
+function renderClozeExam() {
+  document.getElementById('cloze-home').style.display = 'none';
+  const area = document.getElementById('cloze-exam-area');
+  area.style.display = 'block';
+  const ex = currentCloze;
+  
+  let passageHtml = ex.passage;
+  ex.blanks.forEach((b, i) => {
+    passageHtml = passageHtml.replace(`{${i}}`, `<span class="cloze-blank" id="cloze-blank-${i}">[${i+1}]</span>`);
+  });
+  
+  const clozeVocab = ['tidy','paintings','speech','progress','queue','supermarket','section','checkout','cute','chasing','smart','proud','recycling','environment','balloon','lantern','firework','resolution','determination','perseverance','ambition','career','technology','electronic','device','convenient','journey','destination','tourist','scenic','historical','ancient','traditional','delicious','restaurant','underground','direction','pavement','crossing','traffic','straight','along','safety','careful','forbidden','warning','instruction','entrance','exit','danger','prohibit','litter','spicy','sour','bitter','tasty','fresh','frozen','boiled','healthy','diet','nutrition','protein','vitamin','calcium','energy','calorie','exercise','habit','celebrate','decorate','invite','guest','balloon','candle','present','prepare','welcome','enjoy','improve','goal','achieve','success','practice','challenge','effort','overcome','relative','member','cycle','badminton','cinema','together','only','honest','helpful','kind','cruel','naughty','generous','hardworking','lazy','funny','nearby','tunnel','bridge','museum','attract','tourist','scenic','modern','temple','palace'];
+  
+  const words = passageHtml.split(/(<span[^>]*>[\s\S]*?<\/span>| )/);
+  for (let i = 0; i < words.length; i++) {
+    if (words[i] && !words[i].startsWith('<') && words[i].trim().length > 2) {
+      const word = words[i].trim().replace(/[^a-zA-Z]/g, '');
+      if (word.length > 2 && clozeVocab.includes(word.toLowerCase())) {
+        words[i] = words[i].replace(word, `<span class="clickable-word" onclick="showWordPopup('${word}','',event)">${word}</span>`);
+      }
+    }
+  }
+  passageHtml = words.join('');
+  
+  let html = `<div class="top-bar"><div class="date-block"><div class="weekday" style="font-size:1.1rem;cursor:pointer" onclick="exitCloze()">← 返回</div><div class="date">${ex.title}</div></div></div>
+    <div style="background:var(--en-light);border-radius:8px;padding:0.5rem 0.75rem;margin-bottom:0.75rem;font-size:0.75rem;color:var(--en-dark)">💡 点击文章中的<span class="clickable-word">生词</span>可查看释义</div>
+    <div class="question-block"><div class="q-text">${ex.title}</div><div class="cloze-passage">${passageHtml}</div></div>
+    <div class="section-label"><span>📝</span> 选择填空</div>`;
+  
+  ex.blanks.forEach((b, i) => {
+    html += `<div class="question-block" id="cq-${i}"><div class="q-text"><span class="q-num">${i+1}.</span>第${i+1}空</div>${b.o.map((opt, j) => `<div class="option-row" onclick="selectClozeOption(${i},${j})"><div class="option-letter">${'ABCD'[j]}</div><span>${opt}</span></div>`).join('')}</div>`;
+  });
+  
+  html += `<button class="btn btn-primary btn-block" style="margin-top:0.75rem" onclick="submitCloze()">提交批改</button>`;
+  area.innerHTML = html;
+}
+
+function selectClozeOption(qIdx, optIdx) {
+  const block = document.getElementById('cq-' + qIdx);
+  if (!block) return;
+  block.querySelectorAll('.option-row').forEach(r => r.classList.remove('selected'));
+  block.querySelectorAll('.option-row')[optIdx].classList.add('selected');
+  clozeAnswers[qIdx] = optIdx;
+}
+
+function submitCloze() {
+  if (!currentCloze) return;
+  const ex = currentCloze;
+  let correct = 0;
+  const total = ex.blanks.length;
+  
+  ex.blanks.forEach((b, i) => {
+    const ua = clozeAnswers[i];
+    const block = document.getElementById('cq-' + i);
+    if (!block) return;
+    block.querySelectorAll('.option-row').forEach((opt, j) => {
+      opt.classList.remove('selected');
+      if (j === b.a) opt.classList.add('correct');
+      else if (j === ua) opt.classList.add('wrong');
+      opt.style.pointerEvents = 'none';
+    });
+    if (ua === b.a) correct++;
+    else addError('cloze', `第${i+1}空：${b.e}`, b.o[b.a], ua !== undefined ? b.o[ua] : '未作答', b.e);
+  });
+  
+  const score = Math.round(correct / total * 100);
+  if (!data.clozeHistory) data.clozeHistory = [];
+  data.clozeHistory.push({ date: getTodayStr(), title: ex.title, score, correct, total, index: ex.originalIndex });
+  if (!data.clozeDone) data.clozeDone = {};
+  data.clozeDone[getTodayStr()] = true;
+  saveData();
+  
+  autoCompleteTask('cloze');
+  
+  showModal(`<h3>完形填空完成</h3><div class="score-display"><div class="score-num">${correct}</div><div class="score-total">/${total}</div><div class="score-label">正确率 ${score}%</div></div><p>错题已自动加入错题本</p><button class="btn btn-primary" onclick="closeModal()">查看解析</button><button class="btn btn-outline" onclick="exitCloze()">返回</button>`);
+  renderErrorBook();
+}
+
+function exitCloze() {
+  closeModal();
+  currentCloze = null;
+  clozeAnswers = {};
+  document.getElementById('cloze-exam-area').style.display = 'none';
+  document.getElementById('cloze-home').style.display = 'block';
+  renderClozeHistory();
+}
+
+function renderClozeHistory() {
+  const container = document.getElementById('cloze-history');
+  if (!data.clozeHistory || data.clozeHistory.length === 0) {
+    container.innerHTML = '<div class="empty-state">还没有记录<br>点击上方按钮开始第一篇</div>';
+    return;
+  }
+  container.innerHTML = data.clozeHistory.slice().reverse().map(s => 
+    `<div class="vocab-list-item"><div><span class="en-word">${s.correct}/${s.total}</span><span class="cn-word"> — ${s.title} · ${s.date}</span></div><span class="stage-badge ${s.score>=80?'stage-5':s.score>=60?'stage-2':'stage-1'}">${s.score>=80?'优':s.score>=60?'良':'加油'}</span></div>`
+  ).join('');
+}
+
+// ==================== PAGE: MOCK EXAM ====================
+let currentMockExam = null;
+let mockAnswers = {};
+let mockTimerInterval = null;
+
+async function generateMockExam() {
+  showLoading('AI正在生成模拟卷...', '智能组卷中');
+  await new Promise(r => setTimeout(r, 1200));
+  
+  const vocabQs = [...MOCK_VOCAB_Q].sort(() => Math.random() - 0.5).slice(0, 10);
+  const grammarQs = [...MOCK_GRAMMAR_Q].sort(() => Math.random() - 0.5).slice(0, 10);
+  const cloze = MOCK_CLOZE[Math.floor(Math.random() * MOCK_CLOZE.length)];
+  const reading = MOCK_READING[Math.floor(Math.random() * MOCK_READING.length)];
+  
+  const shuffleOptions = (q) => {
+    const correct = q.o[q.a];
+    q.o = [...q.o].sort(() => Math.random() - 0.5);
+    q.a = q.o.indexOf(correct);
+  };
+  vocabQs.forEach(shuffleOptions);
+  grammarQs.forEach(shuffleOptions);
+  const clozeBlanks = JSON.parse(JSON.stringify(cloze.blanks));
+  clozeBlanks.forEach(shuffleOptions);
+  
+  currentMockExam = { vocabQs, grammarQs, cloze: {...cloze, blanks: clozeBlanks}, reading, startTime: Date.now() };
+  mockAnswers = {};
+  hideLoading();
+  renderMockExam();
+  showToast('模拟卷已生成！共35题，限时45分钟');
+}
+
+function renderMockExam() {
+  document.getElementById('mock-home').style.display = 'none';
+  const area = document.getElementById('mock-exam-area');
+  area.style.display = 'block';
+  const ex = currentMockExam;
+  
+  let html = `<div class="top-bar"><div class="date-block"><div class="weekday" style="font-size:1.1rem;cursor:pointer" onclick="exitMockExam()">← 退出</div><div class="date">AI生成模拟卷 · 35题</div></div></div>
+    <div style="background:var(--white);border-radius:var(--radius);padding:0.75rem;margin-bottom:0.75rem;box-shadow:var(--shadow);text-align:center"><span style="font-size:0.8rem;color:var(--muted)">用时：</span><span id="mock-timer" style="font-size:1.1rem;font-weight:700;color:var(--en)">00:00</span></div>`;
+  
+  html += '<div class="section-label"><span>1️⃣</span> 词汇选择（10题）</div>';
+  ex.vocabQs.forEach((q, i) => {
+    html += `<div class="question-block" id="mq-v-${i}"><div class="q-text"><span class="q-num">${i+1}.</span>${q.q}</div>${q.o.map((opt, j) => `<div class="option-row" onclick="selectMockOption('v-${i}',${j})"><div class="option-letter">${'ABCD'[j]}</div><span>${opt}</span></div>`).join('')}</div>`;
+  });
+  
+  html += '<div class="section-label"><span>2️⃣</span> 语法选择（10题）</div>';
+  ex.grammarQs.forEach((q, i) => {
+    html += `<div class="question-block" id="mq-g-${i}"><div class="q-text"><span class="q-num">${i+1}.</span>${q.q}</div>${q.o.map((opt, j) => `<div class="option-row" onclick="selectMockOption('g-${i}',${j})"><div class="option-letter">${'ABCD'[j]}</div><span>${opt}</span></div>`).join('')}</div>`;
+  });
+  
+  html += '<div class="section-label"><span>3️⃣</span> 完形填空（10题）</div>';
+  html += `<div class="question-block"><div class="q-text">${ex.cloze.title}</div><div style="font-size:0.82rem;line-height:1.8;margin-bottom:0.5rem">${formatClozePassage(ex.cloze.passage, ex.cloze.blanks)}</div></div>`;
+  ex.cloze.blanks.forEach((b, i) => {
+    html += `<div class="question-block" id="mq-c-${i}"><div class="q-text"><span class="q-num">${i+1}.</span>第${i+1}空</div>${b.o.map((opt, j) => `<div class="option-row" onclick="selectMockOption('c-${i}',${j})"><div class="option-letter">${'ABCD'[j]}</div><span>${opt}</span></div>`).join('')}</div>`;
+  });
+  
+  html += '<div class="section-label"><span>4️⃣</span> 阅读理解（5题）</div>';
+  html += `<div class="question-block"><div class="q-text">${ex.reading.title}</div><div style="font-size:0.82rem;line-height:1.8;margin-bottom:0.5rem">${ex.reading.passage}</div></div>`;
+  ex.reading.questions.forEach((q, i) => {
+    html += `<div class="question-block" id="mq-r-${i}"><div class="q-text"><span class="q-num">${i+1}.</span>${q.q}</div>${q.o.map((opt, j) => `<div class="option-row" onclick="selectMockOption('r-${i}',${j})"><div class="option-letter">${'ABCD'[j]}</div><span>${opt}</span></div>`).join('')}</div>`;
+  });
+  
+  html += `<button class="btn btn-primary btn-block" style="margin-top:0.75rem" onclick="submitMockExam()">交卷</button>`;
+  area.innerHTML = html;
+  startMockTimer();
+}
+
+function formatClozePassage(passage, blanks) {
+  let result = passage;
+  blanks.forEach((b, i) => { result = result.replace(`{${i}}`, `<span style="color:var(--en);font-weight:700">[${i+1}]</span>`); });
+  return result;
+}
+
+function selectMockOption(qid, optIdx) {
+  const block = document.getElementById('mq-' + qid);
+  if (!block) return;
+  block.querySelectorAll('.option-row').forEach(r => r.classList.remove('selected'));
+  block.querySelectorAll('.option-row')[optIdx].classList.add('selected');
+  mockAnswers[qid] = optIdx;
+}
+
+function startMockTimer() {
+  if (mockTimerInterval) clearInterval(mockTimerInterval);
+  mockTimerInterval = setInterval(() => {
+    const el = document.getElementById('mock-timer');
+    if (!el || !currentMockExam) { clearInterval(mockTimerInterval); return; }
+    const sec = Math.floor((Date.now() - currentMockExam.startTime) / 1000);
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }, 1000);
+}
+
+function submitMockExam() {
+  if (!currentMockExam) return;
+  if (mockTimerInterval) clearInterval(mockTimerInterval);
+  const ex = currentMockExam;
+  let correct = 0;
+  let total = 0;
+  
+  const gradeSection = (questions, prefix, typeName) => {
+    questions.forEach((q, i) => {
+      total++;
+      const ua = mockAnswers[prefix + '-' + i];
+      const block = document.getElementById('mq-' + prefix + '-' + i);
+      if (!block) return;
+      block.querySelectorAll('.option-row').forEach((opt, j) => {
+        opt.classList.remove('selected');
+        if (j === q.a) opt.classList.add('correct');
+        else if (j === ua) opt.classList.add('wrong');
+        opt.style.pointerEvents = 'none';
+      });
+      if (ua === q.a) correct++;
+      else addError('mock', `${typeName}第${i+1}题：${q.q}`, q.o[q.a], ua !== undefined ? q.o[ua] : '未作答', q.e);
+    });
+  };
+  
+  gradeSection(ex.vocabQs, 'v', '词汇');
+  gradeSection(ex.grammarQs, 'g', '语法');
+  
+  ex.cloze.blanks.forEach((b, i) => {
+    total++;
+    const ua = mockAnswers['c-' + i];
+    const block = document.getElementById('mq-c-' + i);
+    if (!block) return;
+    block.querySelectorAll('.option-row').forEach((opt, j) => {
+      opt.classList.remove('selected');
+      if (j === b.a) opt.classList.add('correct');
+      else if (j === ua) opt.classList.add('wrong');
+      opt.style.pointerEvents = 'none';
+    });
+    if (ua === b.a) correct++;
+    else addError('mock', `完形第${i+1}空：${b.e}`, b.o[b.a], ua !== undefined ? b.o[ua] : '未作答', b.e);
+  });
+  
+  ex.reading.questions.forEach((q, i) => {
+    total++;
+    const ua = mockAnswers['r-' + i];
+    const block = document.getElementById('mq-r-' + i);
+    if (!block) return;
+    block.querySelectorAll('.option-row').forEach((opt, j) => {
+      opt.classList.remove('selected');
+      if (j === q.a) opt.classList.add('correct');
+      else if (j === ua) opt.classList.add('wrong');
+      opt.style.pointerEvents = 'none';
+    });
+    if (ua === q.a) correct++;
+    else addError('mock', `阅读第${i+1}题：${q.q}`, q.o[q.a], ua !== undefined ? q.o[ua] : '未作答', q.e || '');
+  });
+  
+  const score = Math.round(correct / total * 100);
+  const time = Math.floor((Date.now() - ex.startTime) / 1000);
+  const timeStr = `${Math.floor(time/60)}分${time%60}秒`;
+  
+  if (!data.mockScores) data.mockScores = [];
+  data.mockScores.push({ date: getTodayStr(), score, correct, total, time: timeStr });
+  saveData();
+  
+  autoCompleteTask('mockexam');
+  
+  showModal(`<h3>模拟卷完成！</h3><div class="score-display"><div class="score-num">${score}</div><div class="score-total">分</div><div class="score-label">正确 ${correct}/${total} 题 · 用时 ${timeStr}</div></div><p style="font-size:0.78rem;margin-top:0.5rem">${score>=90?'太棒了！继续保持！':score>=70?'不错！继续加油！':'别灰心，多练习一定会有进步！'}</p><p style="font-size:0.78rem;color:var(--en)">错题已自动加入错题本</p><button class="btn btn-primary" onclick="closeModal()">查看解析</button><button class="btn btn-outline" onclick="exitMockExam()">返回</button>`);
+  renderStats();
+  renderErrorBook();
+}
+
+function exitMockExam() {
+  closeModal();
+  if (mockTimerInterval) clearInterval(mockTimerInterval);
+  currentMockExam = null;
+  mockAnswers = {};
+  document.getElementById('mock-exam-area').style.display = 'none';
+  document.getElementById('mock-home').style.display = 'block';
+  renderMockHistory();
+}
+
+function renderMockHistory() {
+  const container = document.getElementById('mock-history');
+  if (!data.mockScores || data.mockScores.length === 0) { container.innerHTML = '<div class="empty-state">还没有模拟记录<br>点击上方按钮生成第一套</div>'; return; }
+  container.innerHTML = data.mockScores.slice().reverse().map(s => 
+    `<div class="vocab-list-item"><div><span class="en-word">${s.score}分</span><span class="cn-word"> — ${s.date} · ${s.correct}/${s.total} · ${s.time}</span></div><span class="stage-badge ${s.score>=90?'stage-5':s.score>=70?'stage-2':'stage-1'}">${s.score>=90?'优':s.score>=70?'良':'加油'}</span></div>`
+  ).join('');
+}
+
+// ==================== PAGE: STATS ====================
+function renderStats() {
+  document.getElementById('stat-streak').textContent = data.checkInStreak || 0;
+  document.getElementById('stat-vocab').textContent = data.fetchedWords.length;
+  let weekTasks = 0;
+  for (let i = 0; i < 7; i++) { const ds = getDateStr(-i); const dt = data.tasks[ds]; if (dt) weekTasks += Object.values(dt).filter(v => v).length; }
+  document.getElementById('stat-week-tasks').textContent = weekTasks;
+  const listeningCount = data.listeningDone ? Object.values(data.listeningDone).filter(v => v).length : 0;
+  document.getElementById('stat-listening').textContent = listeningCount;
+  
+  const labels = document.getElementById('heatmap-labels');
+  const grid = document.getElementById('heatmap-grid');
+  labels.innerHTML = ''; grid.innerHTML = '';
+  for (let i = 13; i >= 0; i--) {
+    const ds = getDateStr(-i);
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const dt = data.tasks[ds];
+    const doneCount = dt ? Object.values(dt).filter(v => v).length : 0;
+    const cell = document.createElement('div');
+    cell.className = 'heatmap-cell';
+    if (doneCount > 0) cell.classList.add('has-data');
+    if (doneCount >= 3) cell.classList.add('full');
+    if (i === 0) cell.classList.add('today');
+    cell.textContent = d.getDate();
+    grid.appendChild(cell);
+  }
+  ['日','一','二','三','四','五','六'].forEach(l => { const label = document.createElement('div'); label.textContent = l; labels.appendChild(label); });
+  
+  const vocabCount = data.fetchedWords.length;
+  const progress = Math.min(100, Math.max(0, vocabCount / 2000 * 100));
+  document.getElementById('milestone-fill').style.width = progress + '%';
+  document.getElementById('milestone-current').textContent = `${vocabCount} 词`;
+  document.getElementById('milestone-target').textContent = '目标 2000 词';
+  
+  const milestones = [
+    {vocab:100,label:'10月初 · 一般现在时不混用',done:vocabCount>=100},
+    {vocab:300,label:'1月期末 · 英语120分达成',done:vocabCount>=300},
+    {vocab:500,label:'3月初 · 四大时态不混用',done:vocabCount>=500},
+    {vocab:800,label:'6月期末 · 英语130分达成',done:vocabCount>=800},
+    {vocab:1200,label:'8月暑假 · 英语135分',done:vocabCount>=1200},
+    {vocab:2000,label:'初二6月 · 英语140分 ★',done:vocabCount>=2000}
+  ];
+  document.getElementById('milestone-list').innerHTML = milestones.map(m => `<div style="color:${m.done?'var(--green)':'var(--muted)'}">${m.done?'✓':'○'} ${m.label} (${m.vocab}词)</div>`).join('');
+  
+  if (data.reminder) {
+    document.getElementById('reminder-time').value = data.reminder.time || '19:00';
+    document.getElementById('reminder-toggle').classList.toggle('on', data.reminder.enabled !== false);
+  }
+  if ('Notification' in window && Notification.permission === 'granted') {
+    const btn = document.getElementById('notify-btn');
+    btn.textContent = '已开启 ✓'; btn.style.opacity = '0.6';
+  }
+}
+
+// ==================== PLAN ====================
+function renderPlan() {
+  const sem = data.semester;
+  const container = document.getElementById('plan-content');
+  const todayDow = getDayOfWeek();
+  let html = '';
+  for (let day = 1; day <= 7; day++) {
+    const jsDay = day === 7 ? 0 : day;
+    const isToday = jsDay === todayDow;
+    const enTasks = PLANS[sem][jsDay] || [];
+    html += `<div class="plan-row ${isToday?'today-row':''}"><div class="plan-day">${WEEKDAYS[jsDay]}</div><div class="plan-tasks">`;
+    enTasks.forEach(t => { html += `<div class="plan-task-item en"><strong>${t.name}</strong> ${t.time} · ${t.detail}</div>`; });
+    html += `</div></div>`;
+  }
+  container.innerHTML = html;
+}
+
+function togglePlanCollapse() {
+  const body = document.getElementById('plan-collapse-body');
+  const icon = document.getElementById('plan-collapse-icon');
+  body.classList.toggle('open');
+  icon.textContent = body.classList.contains('open') ? '▴' : '▾';
+}
+
+function switchSemester(sem) {
+  data.semester = sem;
+  saveData();
+  document.getElementById('sem-7a-btn').classList.toggle('active', sem === '7a');
+  document.getElementById('sem-7b-btn').classList.toggle('active', sem === '7b');
+  renderPlan();
+  renderToday();
+  renderVocab();
+  showToast(sem === '7a' ? '已切换到七上' : '已切换到七下');
+}
+
+// ==================== NAVIGATION ====================
+function switchPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const pageMap = { today:'page-today', vocab:'page-vocab', listening:'page-listening', cloze:'page-cloze', mock:'page-mock', errors:'page-errors', stats:'page-stats' };
+  document.getElementById(pageMap[page]).classList.add('active');
+  const navs = document.querySelectorAll('.nav-item');
+  const idx = { today:0, vocab:1, listening:2, cloze:3, mock:4, errors:5, stats:6 }[page];
+  navs[idx].classList.add('active');
+  if (page === 'today') renderToday();
+  if (page === 'vocab') renderVocab();
+  if (page === 'listening') renderListeningList();
+  if (page === 'cloze') renderClozeHistory();
+  if (page === 'mock') renderMockHistory();
+  if (page === 'errors') renderErrorBook('all');
+  if (page === 'stats') renderStats();
+  stopSpeak();
+}
+
+// ==================== INIT ====================
+setInterval(checkReminder, 60000);
+renderToday();
+renderVocab();
+renderListeningList();
+renderClozeHistory();
+renderMockHistory();
+renderErrorBook('all');
+renderStats();
+renderPlan();
+</script>
+</body>
+</html>
