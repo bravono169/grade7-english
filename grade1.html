@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="一年级学习">
+<meta name="application-name" content="一年级学习">
+<meta name="theme-color" content="#4A90D9">
+<meta name="format-detection" content="telephone=no">
+<title>一年级每日学习</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Crect width='180' height='180' rx='40' fill='%234A90D9'/%3E%3Ctext x='90' y='120' font-size='80' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E1A%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Crect width='192' height='192' rx='40' fill='%234A90D9'/%3E%3Ctext x='96' y='130' font-size='80' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3E1A%3C/text%3E%3C/svg%3E">
+<style>
+:root {
+  --bg: #FFF8F0;
+  --bg2: #FFFFFF;
+  --ink: #2D3436;
+  --muted: #636E72;
+  --rule: #E8EBED;
+  --primary: #4A90D9;
+  --chinese: #E74C3C;
+  --math: #F39C12;
+  --english: #9B59B6;
+  --success: #2ECC71;
+  --star: #F1C40F;
+  --shadow: 0 2px 12px rgba(0,0,0,0.08);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { font-size:16px; }
+body {
+  font-family: -apple-system, "Microsoft YaHei", "PingFang SC", sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height:1.6;
+  -webkit-font-smoothing: antialiased;
+  max-width:480px;
+  margin:0 auto;
+  min-height:100vh;
+  padding-bottom:72px;
+}
+.page { display:none; padding:16px; animation:fadeIn .3s; }
+.page.active { display:block; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+@keyframes pop { 0%{transform:scale(.8);opacity:0} 50%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+@keyframes starFly { 0%{transform:scale(0) rotate(-180deg);opacity:0} 100%{transform:scale(1) rotate(0);opacity:1} }
+
+/* Top bar */
+.top-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.date-block { display:flex; flex-direction:column; }
+.weekday { font-size:1.1rem; font-weight:700; color:var(--ink); }
+.date { font-size:.8rem; color:var(--muted); }
+.star-badge { display:flex; align-items:center; gap:4px; background:linear-gradient(135deg,#FFD700,#FFA500); color:#fff; padding:6px 14px; border-radius:20px; font-weight:700; font-size:1rem; box-shadow:0 2px 8px rgba(255,165,0,.3); }
+.checkin-btn { width:100%; padding:14px; border:none; border-radius:var(--radius); font-size:1.05rem; font-weight:700; color:#fff; background:linear-gradient(135deg,var(--primary),#5BA0F5); box-shadow:0 4px 14px rgba(74,144,217,.35); cursor:pointer; transition:transform .15s; margin-bottom:16px; }
+.checkin-btn:active { transform:scale(.97); }
+.checkin-btn.done { background:linear-gradient(135deg,var(--success),#27AE60); }
+
+/* Subject cards */
+.subject-card { background:var(--bg2); border-radius:var(--radius); padding:16px; margin-bottom:12px; box-shadow:var(--shadow); }
+.subject-card.chinese { border-left:4px solid var(--chinese); }
+.subject-card.math { border-left:4px solid var(--math); }
+.subject-card.english { border-left:4px solid var(--english); }
+.subject-header { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+.subject-icon { font-size:1.6rem; }
+.subject-name { font-size:1.05rem; font-weight:700; }
+.subject-time { font-size:.75rem; color:var(--muted); margin-left:auto; background:var(--bg); padding:2px 10px; border-radius:10px; }
+.task-list { list-style:none; }
+.task-item { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--rule); }
+.task-item:last-child { border:none; }
+.task-check { width:26px; height:26px; border-radius:50%; border:2px solid var(--rule); display:flex; align-items:center; justify-content:center; font-size:.8rem; cursor:pointer; flex-shrink:0; transition:all .2s; }
+.task-check.done { background:var(--success); border-color:var(--success); color:#fff; }
+.task-text { font-size:.9rem; flex:1; }
+.task-text.done { text-decoration:line-through; color:var(--muted); }
+
+/* Progress */
+.progress-ring { width:80px; height:80px; margin:8px auto 16px; position:relative; }
+.progress-ring svg { width:100%; height:100%; transform:rotate(-90deg); }
+.progress-ring .bg-circle { fill:none; stroke:var(--rule); stroke-width:6; }
+.progress-ring .fg-circle { fill:none; stroke:var(--primary); stroke-width:6; stroke-linecap:round; transition:stroke-dashoffset .5s; }
+.progress-text { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:1.1rem; font-weight:700; }
+
+/* Section title */
+.section-title { font-size:1.15rem; font-weight:700; margin:16px 0 10px; display:flex; align-items:center; gap:6px; }
+
+/* Category tabs */
+.cat-tabs { display:flex; gap:8px; margin-bottom:14px; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:4px; }
+.cat-tab { padding:8px 16px; border-radius:20px; font-size:.85rem; font-weight:600; white-space:nowrap; background:var(--bg2); color:var(--muted); border:1px solid var(--rule); cursor:pointer; transition:all .2s; }
+.cat-tab.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+
+/* Pinyin card grid */
+.pinyin-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(64px,1fr)); gap:10px; }
+.pinyin-card { background:var(--bg2); border-radius:var(--radius-sm); padding:14px 8px; text-align:center; box-shadow:var(--shadow); cursor:pointer; transition:transform .15s; border:2px solid transparent; }
+.pinyin-card:active { transform:scale(.95); }
+.pinyin-card.playing { border-color:var(--primary); animation:bounce .4s; }
+.pinyin-p { font-size:1.6rem; font-weight:700; color:var(--chinese); margin-bottom:4px; }
+.pinyin-c { font-size:1.8rem; color:var(--ink); margin-bottom:2px; }
+.pinyin-cat { font-size:.65rem; color:var(--muted); }
+
+/* Character card */
+.char-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:12px; }
+.char-card { background:var(--bg2); border-radius:var(--radius); padding:14px 10px; text-align:center; box-shadow:var(--shadow); cursor:pointer; transition:transform .15s; }
+.char-card:active { transform:scale(.95); }
+.char-card .ch { font-size:2.2rem; font-weight:700; color:var(--ink); margin-bottom:6px; line-height:1.2; }
+.char-card .py { font-size:.8rem; color:var(--chinese); margin-bottom:2px; }
+.char-card .meaning { font-size:.7rem; color:var(--muted); }
+.char-card.playing { animation:bounce .4s; }
+
+/* Math practice */
+.math-display { text-align:center; padding:24px 16px; background:var(--bg2); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:14px; }
+.math-q { font-size:2.4rem; font-weight:700; color:var(--ink); margin-bottom:16px; }
+.math-options { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.math-opt { padding:12px 4px; border:2px solid var(--rule); border-radius:var(--radius-sm); font-size:1.3rem; font-weight:700; text-align:center; cursor:pointer; background:var(--bg2); transition:all .2s; }
+.math-opt:active { transform:scale(.92); }
+.math-opt.correct { border-color:var(--success); background:#E8F8F0; color:var(--success); }
+.math-opt.wrong { border-color:#E74C3C; background:#FDEDEC; color:#E74C3C; animation:bounce .3s; }
+.math-stats { display:flex; justify-content:space-around; margin-bottom:10px; font-size:.85rem; color:var(--muted); }
+.math-stat { text-align:center; }
+.math-stat .num { font-size:1.3rem; font-weight:700; color:var(--ink); }
+
+/* Shape practice */
+.shape-display { text-align:center; padding:20px; background:var(--bg2); border-radius:var(--radius); box-shadow:var(--shadow); margin-bottom:14px; }
+.shape-obj { font-size:3rem; margin:8px 0 12px; }
+.shape-q { font-size:1rem; color:var(--ink); margin-bottom:14px; }
+.shape-options { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+.shape-opt { padding:14px; border:2px solid var(--rule); border-radius:var(--radius-sm); font-size:.95rem; font-weight:600; cursor:pointer; background:var(--bg2); transition:all .2s; }
+.shape-opt:active { transform:scale(.95); }
+.shape-opt.correct { border-color:var(--success); background:#E8F8F0; }
+.shape-opt.wrong { border-color:#E74C3C; background:#FDEDEC; }
+
+/* English vocab */
+.vocab-card { background:var(--bg2); border-radius:var(--radius); padding:20px; text-align:center; box-shadow:var(--shadow); margin-bottom:14px; cursor:pointer; transition:transform .2s; }
+.vocab-card:active { transform:scale(.97); }
+.vocab-emoji { font-size:3rem; margin-bottom:8px; }
+.vocab-en { font-size:1.5rem; font-weight:700; color:var(--english); margin-bottom:4px; }
+.vocab-cn { font-size:1.1rem; color:var(--ink); margin-bottom:2px; }
+.vocab-phon { font-size:.75rem; color:var(--muted); }
+.vocab-card.playing { animation:bounce .4s; }
+
+/* Quiz */
+.quiz-card { background:var(--bg2); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow); margin-bottom:14px; }
+.quiz-q { font-size:1rem; font-weight:600; margin-bottom:12px; color:var(--ink); }
+.quiz-options { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+.quiz-opt { padding:10px; border:2px solid var(--rule); border-radius:var(--radius-sm); font-size:.9rem; cursor:pointer; text-align:center; transition:all .2s; background:var(--bg2); }
+.quiz-opt:active { transform:scale(.95); }
+.quiz-opt.correct { border-color:var(--success); background:#E8F8F0; color:var(--success); }
+.quiz-opt.wrong { border-color:#E74C3C; background:#FDEDEC; }
+.quiz-feedback { margin-top:10px; font-size:.85rem; color:var(--success); font-weight:600; }
+
+/* Flashcard */
+.flash-area { perspective:1000px; }
+.flash-card { position:relative; width:100%; height:200px; transition:transform .5s; transform-style:preserve-3d; cursor:pointer; }
+.flash-card.flipped { transform:rotateY(180deg); }
+.flash-front, .flash-back { position:absolute; width:100%; height:100%; backface-visibility:hidden; border-radius:var(--radius); display:flex; flex-direction:column; align-items:center; justify-content:center; box-shadow:var(--shadow); }
+.flash-front { background:linear-gradient(135deg,var(--primary),#5BA0F5); color:#fff; }
+.flash-back { background:var(--bg2); transform:rotateY(180deg); }
+.flash-front .big { font-size:2.5rem; font-weight:700; }
+.flash-front .hint { font-size:.8rem; margin-top:8px; opacity:.8; }
+.flash-back .big { font-size:1.8rem; font-weight:700; color:var(--ink); }
+.flash-back .sub { font-size:.9rem; color:var(--muted); margin-top:6px; }
+.flash-back .py { font-size:.8rem; color:var(--chinese); margin-top:4px; }
+
+/* Nav bar */
+.nav-bar { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; display:flex; background:var(--bg2); border-top:1px solid var(--rule); padding:6px 0; z-index:100; }
+.nav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 0; color:var(--muted); cursor:pointer; transition:color .2s; }
+.nav-item.active { color:var(--primary); }
+.nav-icon { font-size:1.3rem; }
+.nav-label { font-size:.65rem; font-weight:600; }
+
+/* Stats */
+.stat-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:16px; }
+.stat-card { background:var(--bg2); border-radius:var(--radius); padding:16px; text-align:center; box-shadow:var(--shadow); }
+.stat-card .num { font-size:1.8rem; font-weight:700; color:var(--primary); }
+.stat-card .label { font-size:.75rem; color:var(--muted); }
+.stat-card.stars .num { color:var(--star); }
+.stat-card.streak .num { color:#E74C3C; }
+
+.badge-list { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+.badge { text-align:center; padding:10px 4px; border-radius:var(--radius-sm); background:var(--bg2); box-shadow:var(--shadow); }
+.badge .icon { font-size:1.8rem; }
+.badge .name { font-size:.6rem; color:var(--muted); margin-top:4px; }
+.badge.locked { opacity:.4; filter:grayscale; }
+
+/* Plan table */
+.plan-table { width:100%; border-collapse:collapse; font-size:.78rem; }
+.plan-table th { background:var(--bg2); padding:8px 4px; text-align:left; font-size:.75rem; color:var(--muted); border-bottom:2px solid var(--rule); }
+.plan-table td { padding:8px 4px; border-bottom:1px solid var(--rule); vertical-align:top; }
+.plan-table .day-cell { font-weight:700; white-space:nowrap; }
+.plan-table .today-row { background:#EBF5FF; }
+.plan-table .sub-chinese { color:var(--chinese); }
+.plan-table .sub-math { color:var(--math); }
+.plan-table .sub-english { color:var(--english); }
+
+/* Reminder */
+.reminder-bar { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:#FFF3E0; border-radius:var(--radius); margin-bottom:12px; }
+.reminder-bar .text { font-size:.85rem; }
+.reminder-bar button { padding:4px 12px; border:none; border-radius:12px; background:var(--math); color:#fff; font-size:.75rem; cursor:pointer; }
+.toggle-switch { width:44px; height:24px; border-radius:12px; background:var(--rule); position:relative; cursor:pointer; transition:background .2s; flex-shrink:0; }
+.toggle-switch.on { background:var(--success); }
+.toggle-switch::after { content:''; position:absolute; width:20px; height:20px; border-radius:50%; background:#fff; top:2px; left:2px; transition:transform .2s; box-shadow:0 1px 4px rgba(0,0,0,.2); }
+.toggle-switch.on::after { transform:translateX(20px); }
+.time-input { border:1px solid var(--rule); border-radius:8px; padding:4px 8px; font-size:.85rem; }
+
+/* Star animation overlay */
+.star-overlay { position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; height:100%; pointer-events:none; z-index:999; display:none; }
+.star-overlay.show { display:block; }
+.star-overlay .star { position:absolute; font-size:2rem; animation:starFly .6s ease-out; }
+
+/* Action buttons */
+.action-btn { padding:10px 16px; border:none; border-radius:var(--radius-sm); font-size:.9rem; font-weight:600; cursor:pointer; transition:transform .15s; }
+.action-btn:active { transform:scale(.95); }
+.action-btn.primary { background:var(--primary); color:#fff; }
+.action-btn.accent { background:var(--star); color:#fff; }
+.action-btn.outline { background:var(--bg2); color:var(--ink); border:1px solid var(--rule); }
+
+/* Notice banner */
+.notice { background:linear-gradient(135deg,#FFF3E0,#FFE0B2); border-radius:var(--radius); padding:10px 14px; margin-bottom:12px; font-size:.85rem; color:#E65100; display:flex; align-items:center; gap:8px; }
+
+/* Subject page header */
+.sub-page-header { display:flex; align-items:center; gap:8px; margin-bottom:14px; }
+.sub-page-header .icon { font-size:1.8rem; }
+.sub-page-header .title { font-size:1.2rem; font-weight:700; }
+.sub-page-header .subtitle { font-size:.75rem; color:var(--muted); }
+
+/* Toast */
+.toast { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,.8); color:#fff; padding:12px 24px; border-radius:12px; font-size:.9rem; z-index:9999; opacity:0; transition:opacity .3s; pointer-events:none; }
+.toast.show { opacity:1; }
+
+/* Mini flashcard nav */
+.flash-nav { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.flash-progress { font-size:.8rem; color:var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- 今日 -->
+<div class="page active" id="page-today">
+  <div class="top-bar">
+    <div class="date-block">
+      <div class="weekday" id="today-weekday">—</div>
+      <div class="date" id="today-date">—</div>
+    </div>
+    <div class="star-badge" id="star-badge" style="display:none">
+      <span>⭐</span><span id="star-num">0</span>
+    </div>
+  </div>
+  <div id="checkin-area"></div>
+  <div class="progress-ring" id="daily-progress" style="display:none">
+    <svg viewBox="0 0 80 80">
+      <circle class="bg-circle" cx="40" cy="40" r="34"/>
+      <circle class="fg-circle" cx="40" cy="40" r="34" stroke-dasharray="213.6" stroke-dashoffset="213.6" id="prog-circle"/>
+    </svg>
+    <div class="progress-text" id="prog-text">0/0</div>
+  </div>
+  <div id="today-tasks"></div>
+</div>
+
+<!-- 语文 -->
+<div class="page" id="page-chinese">
+  <div class="sub-page-header">
+    <span class="icon">📖</span>
+    <div>
+      <div class="title">语文</div>
+      <div class="subtitle">拼音 · 识字 · 阅读</div>
+    </div>
+  </div>
+  <div class="cat-tabs" id="cn-tabs">
+    <div class="cat-tab active" data-cat="pinyin">拼音</div>
+    <div class="cat-tab" data-cat="char">识字</div>
+    <div class="cat-tab" data-cat="reading">阅读</div>
+    <div class="cat-tab" data-cat="writing">书写</div>
+  </div>
+  <div id="cn-content"></div>
+</div>
+
+<!-- 数学 -->
+<div class="page" id="page-math">
+  <div class="sub-page-header">
+    <span class="icon">🔢</span>
+    <div>
+      <div class="title">数学</div>
+      <div class="subtitle">计算 · 图形 · 数感</div>
+    </div>
+  </div>
+  <div class="cat-tabs" id="math-tabs">
+    <div class="cat-tab active" data-cat="add10">10以内加法</div>
+    <div class="cat-tab" data-cat="sub10">10以内减法</div>
+    <div class="cat-tab" data-cat="add20">20以内加法</div>
+    <div class="cat-tab" data-cat="sub20">20以内减法</div>
+    <div class="cat-tab" data-cat="shapes">认识图形</div>
+    <div class="cat-tab" data-cat="count">数一数</div>
+  </div>
+  <div id="math-content"></div>
+</div>
+
+<!-- 英语 -->
+<div class="page" id="page-english">
+  <div class="sub-page-header">
+    <span class="icon">🔤</span>
+    <div>
+      <div class="title">英语</div>
+      <div class="subtitle">字母 · 词汇 · 对话</div>
+    </div>
+  </div>
+  <div class="cat-tabs" id="en-tabs">
+    <div class="cat-tab active" data-cat="alphabet">字母</div>
+    <div class="cat-tab" data-cat="greetings">问候</div>
+    <div class="cat-tab" data-cat="family">家庭</div>
+    <div class="cat-tab" data-cat="animals">动物</div>
+    <div class="cat-tab" data-cat="numbers">数字</div>
+    <div class="cat-tab" data-cat="colors">颜色</div>
+    <div class="cat-tab" data-cat="classroom">课堂</div>
+  </div>
+  <div id="en-content"></div>
+</div>
+
+<!-- 统计 -->
+<div class="page" id="page-stats">
+  <div class="sub-page-header">
+    <span class="icon">🏆</span>
+    <div>
+      <div class="title">我的成就</div>
+      <div class="subtitle">坚持就是胜利</div>
+    </div>
+  </div>
+  <div id="reminder-section"></div>
+  <div class="stat-grid">
+    <div class="stat-card stars"><div class="num" id="stat-stars">0</div><div class="label">⭐ 总星星</div></div>
+    <div class="stat-card streak"><div class="num" id="stat-streak">0</div><div class="label">🔥 连续打卡</div></div>
+    <div class="stat-card"><div class="num" id="stat-cn">0</div><div class="label">📖 识字量</div></div>
+    <div class="stat-card"><div class="num" id="stat-math">0</div><div class="label">🔢 做题数</div></div>
+  </div>
+  <div class="section-title">🎖️ 勋章墙</div>
+  <div class="badge-list" id="badge-list"></div>
+  <div class="section-title">📅 本周计划</div>
+  <div id="plan-section"></div>
+</div>
+
+<!-- Nav bar -->
+<div class="nav-bar">
+  <div class="nav-item active" data-page="today"><span class="nav-icon">🏠</span><span class="nav-label">今日</span></div>
+  <div class="nav-item" data-page="chinese"><span class="nav-icon">📖</span><span class="nav-label">语文</span></div>
+  <div class="nav-item" data-page="math"><span class="nav-icon">🔢</span><span class="nav-label">数学</span></div>
+  <div class="nav-item" data-page="english"><span class="nav-icon">🔤</span><span class="nav-label">英语</span></div>
+  <div class="nav-item" data-page="stats"><span class="nav-icon">🏆</span><span class="nav-label">成就</span></div>
+</div>
+
+<div class="star-overlay" id="star-overlay"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== DATA =====
+
+const PINYIN_DATA = {
+  finals: [
+    {p:'a', c:'啊', cat:'单韵母'},{p:'o', c:'哦', cat:'单韵母'},{p:'e', c:'鹅', cat:'单韵母'},
+    {p:'i', c:'衣', cat:'单韵母'},{p:'u', c:'乌', cat:'单韵母'},{p:'ü', c:'鱼', cat:'单韵母'}
+  ],
+  initials: [
+    {p:'b', c:'波', cat:'声母'},{p:'p', c:'坡', cat:'声母'},{p:'m', c:'摸', cat:'声母'},
+    {p:'f', c:'佛', cat:'声母'},{p:'d', c:'得', cat:'声母'},{p:'t', c:'特', cat:'声母'},
+    {p:'n', c:'讷', cat:'声母'},{p:'l', c:'勒', cat:'声母'},{p:'g', c:'哥', cat:'声母'},
+    {p:'k', c:'科', cat:'声母'},{p:'h', c:'喝', cat:'声母'},{p:'j', c:'鸡', cat:'声母'},
+    {p:'q', c:'欺', cat:'声母'},{p:'x', c:'希', cat:'声母'},{p:'z', c:'资', cat:'声母'},
+    {p:'c', c:'刺', cat:'声母'},{p:'s', c:'丝', cat:'声母'},{p:'zh', c:'知', cat:'声母'},
+    {p:'ch', c:'吃', cat:'声母'},{p:'sh', c:'师', cat:'声母'},{p:'r', c:'日', cat:'声母'},
+    {p:'y', c:'医', cat:'声母'},{p:'w', c:'乌', cat:'声母'}
+  ],
+  compound: [
+    {p:'ai', c:'爱', cat:'复韵母'},{p:'ei', c:'欸', cat:'复韵母'},{p:'ui', c:'威', cat:'复韵母'},
+    {p:'ao', c:'奥', cat:'复韵母'},{p:'ou', c:'欧', cat:'复韵母'},{p:'iu', c:'优', cat:'复韵母'},
+    {p:'ie', c:'耶', cat:'复韵母'},{p:'üe', c:'约', cat:'复韵母'},{p:'er', c:'二', cat:'复韵母'}
+  ],
+  nasal: [
+    {p:'an', c:'安', cat:'前鼻韵母'},{p:'en', c:'恩', cat:'前鼻韵母'},{p:'in', c:'因', cat:'前鼻韵母'},
+    {p:'un', c:'温', cat:'前鼻韵母'},{p:'ün', c:'晕', cat:'前鼻韵母'},
+    {p:'ang', c:'昂', cat:'后鼻韵母'},{p:'eng', c:'哼', cat:'后鼻韵母'},{p:'ing', c:'英', cat:'后鼻韵母'},
+    {p:'ong', c:'翁', cat:'后鼻韵母'}
+  ],
+  whole: [
+    {p:'zhi', c:'织', cat:'整体认读'},{p:'chi', c:'吃', cat:'整体认读'},{p:'shi', c:'狮', cat:'整体认读'},
+    {p:'ri', c:'日', cat:'整体认读'},{p:'zi', c:'字', cat:'整体认读'},{p:'ci', c:'刺', cat:'整体认读'},
+    {p:'si', c:'丝', cat:'整体认读'},{p:'yi', c:'一', cat:'整体认读'},{p:'wu', c:'五', cat:'整体认读'},
+    {p:'yu', c:'鱼', cat:'整体认读'},{p:'yue', c:'月', cat:'整体认读'},{p:'yuan', c:'圆', cat:'整体认读'},
+    {p:'yin', c:'音', cat:'整体认读'},{p:'yun', c:'云', cat:'整体认读'},{p:'ying', c:'鹰', cat:'整体认读'}
+  ]
+};
+
+const CHAR_DATA = [
+  {c:'天', p:'tiān', m:'天空', u:1},{c:'地', p:'dì', m:'大地', u:1},{c:'人', p:'rén', m:'人类', u:1},
+  {c:'金', p:'jīn', m:'金属', u:1},{c:'木', p:'mù', m:'木头', u:1},{c:'水', p:'shuǐ', m:'水', u:1},
+  {c:'火', p:'huǒ', m:'火', u:1},{c:'土', p:'tǔ', m:'泥土', u:1},{c:'口', p:'kǒu', m:'嘴巴', u:1},
+  {c:'耳', p:'ěr', m:'耳朵', u:1},{c:'目', p:'mù', m:'眼睛', u:1},{c:'手', p:'shǒu', m:'手', u:1},
+  {c:'足', p:'zú', m:'脚', u:1},{c:'日', p:'rì', m:'太阳', u:1},{c:'月', p:'yuè', m:'月亮', u:1},
+  {c:'山', p:'shān', m:'山', u:1},{c:'川', p:'chuān', m:'河流', u:1},
+  {c:'一', p:'yī', m:'数字一', u:2},{c:'二', p:'èr', m:'数字二', u:2},{c:'三', p:'sān', m:'数字三', u:2},
+  {c:'四', p:'sì', m:'数字四', u:2},{c:'五', p:'wǔ', m:'数字五', u:2},{c:'六', p:'liù', m:'数字六', u:2},
+  {c:'七', p:'qī', m:'数字七', u:2},{c:'八', p:'bā', m:'数字八', u:2},{c:'九', p:'jiǔ', m:'数字九', u:2},
+  {c:'十', p:'shí', m:'数字十', u:2},
+  {c:'上', p:'shàng', m:'上方', u:3},{c:'下', p:'xià', m:'下方', u:3},{c:'大', p:'dà', m:'大小', u:3},
+  {c:'小', p:'xiǎo', m:'小', u:3},{c:'多', p:'duō', m:'多少', u:3},{c:'少', p:'shǎo', m:'少', u:3},
+  {c:'人', p:'rén', m:'人', u:3},{c:'头', p:'tóu', m:'头部', u:3},
+  {c:'你', p:'nǐ', m:'你', u:4},{c:'我', p:'wǒ', m:'我', u:4},{c:'他', p:'tā', m:'他', u:4},
+  {c:'她', p:'tā', m:'她', u:4},{c:'们', p:'men', m:'复数', u:4},{c:'好', p:'hǎo', m:'好', u:4},
+  {c:'中', p:'zhōng', m:'中间', u:4},{c:'国', p:'guó', m:'国家', u:4},
+  {c:'爸', p:'bà', m:'爸爸', u:5},{c:'妈', p:'mā', m:'妈妈', u:5},{c:'哥', p:'gē', m:'哥哥', u:5},
+  {c:'姐', p:'jiě', m:'姐姐', u:5},{c:'弟', p:'dì', m:'弟弟', u:5},{c:'妹', p:'mèi', m:'妹妹', u:5},
+  {c:'花', p:'huā', m:'花朵', u:5},{c:'草', p:'cǎo', m:'小草', u:5},
+  {c:'春', p:'chūn', m:'春天', u:6},{c:'夏', p:'xià', m:'夏天', u:6},{c:'秋', p:'qiū', m:'秋天', u:6},
+  {c:'冬', p:'dōng', m:'冬天', u:6},{c:'风', p:'fēng', m:'风', u:6},{c:'雨', p:'yǔ', m:'雨', u:6},
+  {c:'雪', p:'xuě', m:'雪', u:6},{c:'云', p:'yún', m:'云', u:6}
+];
+
+const READING_DATA = [
+  {title:'天地人', text:'天地人，你我他。上下来，大小多。'},
+  {title:'金木水火土', text:'一二三四五，金木水火土。天地分上下，日月照今古。'},
+  {title:'口耳目', text:'口耳目，手与足。你问我，我来读。'},
+  {title:'日月山川', text:'日月山川，天地自然。春夏秋冬，风雨雷电。'},
+  {title:'小小一粒种', text:'小小一粒种，种在泥土中。生根又发芽，长大开红花。'},
+  {title:'小蝌蚪', text:'小蝌蚪，水里游，圆圆身子小尾巴。长出腿，掉尾巴，变成青蛙叫呱呱。'}
+];
+
+const WRITING_DATA = [
+  {c:'一', p:'yī', strokes:1, tip:'从左到右，写一横'},{c:'二', p:'èr', strokes:2, tip:'上短下长，两横平行'},
+  {c:'三', p:'sān', strokes:3, tip:'三横平行，中间最短'},{c:'十', p:'shí', strokes:2, tip:'先横后竖，交叉在中间'},
+  {c:'口', p:'kǒu', strokes:3, tip:'先竖后横折再横'},{c:'日', p:'rì', strokes:4, tip:'先竖后横折，中间一横，底横封口'},
+  {c:'目', p:'mù', strokes:5, tip:'先竖后横折，中间两横，底横封口'},{c:'田', p:'tián', strokes:5, tip:'先竖后横折，中间十字，底横封口'},
+  {c:'人', p:'rén', strokes:2, tip:'先撇后捺，撇低捺高'},{c:'大', p:'dà', strokes:3, tip:'先横后撇捺'},
+  {c:'小', p:'xiǎo', strokes:3, tip:'先竖钩，后两点'},{c:'上', p:'shàng', strokes:3, tip:'先竖后短横，底横最长'}
+];
+
+const SHAPES_DATA = [
+  {name:'长方形', emoji:'▭', items:['砖头','课桌面','书本封面','门']},
+  {name:'正方形', emoji:'▢', items:['手帕','棋盘格','魔方面','地砖']},
+  {name:'三角形', emoji:'△', items:['红领巾','三角尺','屋顶','切开的西瓜']},
+  {name:'圆形', emoji:'○', items:['太阳','硬币','车轮','盘子']},
+  {name:'球体', emoji:'⚽', items:['皮球','篮球','地球','汤圆']},
+  {name:'圆柱体', emoji:'▮', items:['易拉罐','铅笔','柱子','杯子']}
+];
+
+const EN_VOCAB = {
+  greetings: [
+    {en:'hello', cn:'你好', ph:'/həˈloʊ/', emoji:'👋'},{en:'hi', cn:'嗨', ph:'/haɪ/', emoji:'🙋'},
+    {en:'good morning', cn:'早上好', ph:'/ɡʊd ˈmɔːrnɪŋ/', emoji:'🌅'},{en:'good afternoon', cn:'下午好', ph:'/ɡʊd ˌæftərˈnuːn/', emoji:'☀️'},
+    {en:'good evening', cn:'晚上好', ph:'/ɡʊd ˈiːvnɪŋ/', emoji:'🌙'},{en:'goodbye', cn:'再见', ph:'/ɡʊdˈbaɪ/', emoji:'👋'},
+    {en:'thank you', cn:'谢谢', ph:'/θæŋk juː/', emoji:'🙏'},{en:'yes', cn:'是的', ph:'/jes/', emoji:'✅'},
+    {en:'no', cn:'不是', ph:'/noʊ/', emoji:'❌'},{en:'please', cn:'请', ph:'/pliːz/', emoji:'🤲'}
+  ],
+  family: [
+    {en:'father', cn:'爸爸', ph:'/ˈfɑːðər/', emoji:'👨'},{en:'mother', cn:'妈妈', ph:'/ˈmʌðər/', emoji:'👩'},
+    {en:'grandfather', cn:'爷爷', ph:'/ˈɡrænfɑːðər/', emoji:'👴'},{en:'grandmother', cn:'奶奶', ph:'/ˈɡrænmʌðər/', emoji:'👵'},
+    {en:'brother', cn:'哥哥/弟弟', ph:'/ˈbrʌðər/', emoji:'👦'},{en:'sister', cn:'姐姐/妹妹', ph:'/ˈsɪstər/', emoji:'👧'},
+    {en:'baby', cn:'宝宝', ph:'/ˈbeɪbi/', emoji:'👶'},{en:'family', cn:'家庭', ph:'/ˈfæməli/', emoji:'👨‍👩‍👧‍👦'}
+  ],
+  animals: [
+    {en:'cat', cn:'猫', ph:'/kæt/', emoji:'🐱'},{en:'dog', cn:'狗', ph:'/dɔːɡ/', emoji:'🐶'},
+    {en:'bird', cn:'鸟', ph:'/bɜːrd/', emoji:'🐦'},{en:'fish', cn:'鱼', ph:'/fɪʃ/', emoji:'🐟'},
+    {en:'rabbit', cn:'兔子', ph:'/ˈræbɪt/', emoji:'🐰'},{en:'bear', cn:'熊', ph:'/ber/', emoji:'🐻'},
+    {en:'duck', cn:'鸭子', ph:'/dʌk/', emoji:'🦆'},{en:'pig', cn:'猪', ph:'/pɪɡ/', emoji:'🐷'},
+    {en:'cow', cn:'牛', ph:'/kaʊ/', emoji:'🐮'},{en:'horse', cn:'马', ph:'/hɔːrs/', emoji:'🐴'}
+  ],
+  numbers: [
+    {en:'one', cn:'一', ph:'/wʌn/', emoji:'1️⃣'},{en:'two', cn:'二', ph:'/tuː/', emoji:'2️⃣'},
+    {en:'three', cn:'三', ph:'/θriː/', emoji:'3️⃣'},{en:'four', cn:'四', ph:'/fɔːr/', emoji:'4️⃣'},
+    {en:'five', cn:'五', ph:'/faɪv/', emoji:'5️⃣'},{en:'six', cn:'六', ph:'/sɪks/', emoji:'6️⃣'},
+    {en:'seven', cn:'七', ph:'/ˈsevn/', emoji:'7️⃣'},{en:'eight', cn:'八', ph:'/eɪt/', emoji:'8️⃣'},
+    {en:'nine', cn:'九', ph:'/naɪn/', emoji:'9️⃣'},{en:'ten', cn:'十', ph:'/ten/', emoji:'🔟'}
+  ],
+  colors: [
+    {en:'red', cn:'红色', ph:'/red/', emoji:'🔴'},{en:'blue', cn:'蓝色', ph:'/bluː/', emoji:'🔵'},
+    {en:'green', cn:'绿色', ph:'/ɡriːn/', emoji:'🟢'},{en:'yellow', cn:'黄色', ph:'/ˈjeloʊ/', emoji:'🟡'},
+    {en:'orange', cn:'橙色', ph:'/ˈɔːrɪndʒ/', emoji:'🟠'},{en:'black', cn:'黑色', ph:'/blæk/', emoji:'⚫'},
+    {en:'white', cn:'白色', ph:'/waɪt/', emoji:'⚪'},{en:'pink', cn:'粉色', ph:'/pɪŋk/', emoji:'🩷'}
+  ],
+  classroom: [
+    {en:'book', cn:'书', ph:'/bʊk/', emoji:'📕'},{en:'pencil', cn:'铅笔', ph:'/ˈpensl/', emoji:'✏️'},
+    {en:'ruler', cn:'尺子', ph:'/ˈruːlər/', emoji:'📏'},{en:'bag', cn:'书包', ph:'/bæɡ/', emoji:'🎒'},
+    {en:'desk', cn:'课桌', ph:'/desk/', emoji:'🪑'},{en:'chair', cn:'椅子', ph:'/tʃer/', emoji:'🪑'},
+    {en:'teacher', cn:'老师', ph:'/ˈtiːtʃər/', emoji:'👩‍🏫'},{en:'school', cn:'学校', ph:'/skuːl/', emoji:'🏫'}
+  ]
+};
+
+const ALPHABET = [
+  {l:'A', w:'Apple', cn:'苹果', emoji:'🍎'},{l:'B', w:'Ball', cn:'球', emoji:'⚽'},
+  {l:'C', w:'Cat', cn:'猫', emoji:'🐱'},{l:'D', w:'Dog', cn:'狗', emoji:'🐶'},
+  {l:'E', w:'Egg', cn:'鸡蛋', emoji:'🥚'},{l:'F', w:'Fish', cn:'鱼', emoji:'🐟'},
+  {l:'G', w:'Girl', cn:'女孩', emoji:'👧'},{l:'H', w:'Hat', cn:'帽子', emoji:'🎩'},
+  {l:'I', w:'Ice cream', cn:'冰淇淋', emoji:'🍦'},{l:'J', w:'Juice', cn:'果汁', emoji:'🧃'},
+  {l:'K', w:'Kite', cn:'风筝', emoji:'🪁'},{l:'L', w:'Lion', cn:'狮子', emoji:'🦁'},
+  {l:'M', w:'Moon', cn:'月亮', emoji:'🌙'},{l:'N', w:'Nose', cn:'鼻子', emoji:'👃'},
+  {l:'O', w:'Orange', cn:'橙子', emoji:'🍊'},{l:'P', w:'Pig', cn:'猪', emoji:'🐷'},
+  {l:'Q', w:'Queen', cn:'女王', emoji:'👑'},{l:'R', w:'Rabbit', cn:'兔子', emoji:'🐰'},
+  {l:'S', w:'Sun', cn:'太阳', emoji:'☀️'},{l:'T', w:'Tiger', cn:'老虎', emoji:'🐯'},
+  {l:'U', w:'Umbrella', cn:'雨伞', emoji:'☂️'},{l:'V', w:'Van', cn:'货车', emoji:'🚐'},
+  {l:'W', w:'Watch', cn:'手表', emoji:'⌚'},{l:'X', w:'X-ray', cn:'X光', emoji:'📸'},
+  {l:'Y', w:'Yellow', cn:'黄色', emoji:'🟡'},{l:'Z', w:'Zoo', cn:'动物园', emoji:'🦁'}
+];
+
+const WEEKLY_PLAN = {
+  1: [
+    {sub:'语文', icon:'📖', name:'拼音入门 - 单韵母 a o e', time:'15min', detail:'跟读a o e，在语文页面点击卡片听发音，每个读3遍'},
+    {sub:'数学', icon:'🔢', name:'1-5的认识和加减法', time:'10min', detail:'在数学页面练习1-5的加法和减法'},
+    {sub:'英语', icon:'🔤', name:'打招呼 Hello!', time:'10min', detail:'学习hello, hi, good morning，点击卡片听发音'}
+  ],
+  2: [
+    {sub:'语文', icon:'📖', name:'单韵母i u ü + 声母b p m f', time:'15min', detail:'跟读i u ü和b p m f，拼读ba po ma fo'},
+    {sub:'数学', icon:'🔢', name:'6-10的认识和加减法', time:'10min', detail:'在数学页面练习6-10的加法和减法'},
+    {sub:'英语', icon:'🔤', name:'自我介绍 I\'m...', time:'10min', detail:'学习I\'m, You\'re, How are you?'}
+  ],
+  3: [
+    {sub:'语文', icon:'📖', name:'声母 d t n l g k h', time:'15min', detail:'跟读声母，练习拼读da te na le ge ke hu'},
+    {sub:'数学', icon:'🔢', name:'10以内加减法综合', time:'10min', detail:'混合练习10以内加减法，挑战正确率'},
+    {sub:'英语', icon:'🔤', name:'我的家人', time:'10min', detail:'学习father, mother, sister等家庭成员词汇'}
+  ],
+  4: [
+    {sub:'语文', icon:'📖', name:'声母 j q x z c s + 识字', time:'15min', detail:'跟读声母，认识"日月山川"生字'},
+    {sub:'数学', icon:'🔢', name:'20以内进位加法', time:'10min', detail:'练习9+2, 8+3等进位加法，学习凑十法'},
+    {sub:'英语', icon:'🔤', name:'可爱动物', time:'10min', detail:'学习cat, dog, bird等动物词汇'}
+  ],
+  5: [
+    {sub:'语文', icon:'📖', name:'声母 zh ch sh r y w + 书写', time:'15min', detail:'跟读声母，练习书写一二三十'},
+    {sub:'数学', icon:'🔢', name:'20以内退位减法', time:'10min', detail:'练习15-8, 13-7等退位减法，学习破十法'},
+    {sub:'英语', icon:'🔤', name:'趣味数字', time:'10min', detail:'学习one到ten，跟读数字'}
+  ],
+  6: [
+    {sub:'语文', icon:'📖', name:'本周总复习 + 小故事', time:'20min', detail:'复习本周拼音和生字，朗读小故事'},
+    {sub:'数学', icon:'🔢', name:'趣味数学大挑战', time:'15min', detail:'混合加减法挑战，认识图形'},
+    {sub:'英语', icon:'🔤', name:'英语儿歌 + 对话', time:'15min', detail:'唱Hello歌，对话角色扮演'}
+  ],
+  0: [
+    {sub:'语文', icon:'📖', name:'绘本朗读时间', time:'15min', detail:'和爸爸妈妈一起读绘本，认识新字'},
+    {sub:'数学', icon:'🔢', name:'数学小游戏', time:'10min', detail:'数一数游戏，图形找朋友'},
+    {sub:'英语', icon:'🔤', name:'趣味复习', time:'10min', detail:'复习本周英语词汇，跟读卡片'}
+  ]
+};
+
+const BADGES = [
+  {id:'first', icon:'🌱', name:'初次打卡', cond:1, type:'checkin'},
+  {id:'week', icon:'📅', name:'坚持一周', cond:7, type:'checkin'},
+  {id:'month', icon:'📆', name:'满月打卡', cond:30, type:'checkin'},
+  {id:'star10', icon:'⭐', name:'10颗星', cond:10, type:'stars'},
+  {id:'star50', icon:'🌟', name:'50颗星', cond:50, type:'stars'},
+  {id:'star100', icon:'✨', name:'100颗星', cond:100, type:'stars'},
+  {id:'cn20', icon:'📖', name:'识字20个', cond:20, type:'cnchars'},
+  {id:'cn50', icon:'📚', name:'识字50个', cond:50, type:'cnchars'},
+  {id:'math50', icon:'✏️', name:'做题50道', cond:50, type:'mathcount'},
+  {id:'math200', icon:'🔢', name:'做题200道', cond:200, type:'mathcount'},
+  {id:'en30', icon:'🔤', name:'英语30词', cond:30, type:'enwords'},
+  {id:'en80', icon:'🎓', name:'英语80词', cond:80, type:'enwords'}
+];
+
+// ===== STORAGE =====
+const STORE_KEY = 'grade1_app_data';
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return {
+    tasks: {},
+    stars: 0,
+    checkIns: {},
+    checkInStreak: 0,
+    cnLearned: [],
+    enLearned: [],
+    mathCorrect: 0,
+    mathTotal: 0,
+    badges: [],
+    reminder: { time: '18:00', enabled: false },
+    startDate: getTodayStr()
+  };
+}
+
+function saveData() { localStorage.setItem(STORE_KEY, JSON.stringify(DATA)); }
+
+function getTodayStr() { return new Date().toISOString().split('T')[0]; }
+
+const DATA = loadData();
+
+// ===== AUDIO =====
+function speak(text, lang) {
+  if (!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang || 'zh-CN';
+  u.rate = 0.85;
+  u.pitch = 1.1;
+  speechSynthesis.speak(u);
+}
+
+function speakEn(text) { speak(text, 'en-US'); }
+
+// ===== HELPERS =====
+function $(s) { return document.querySelector(s); }
+function $$(s) { return document.querySelectorAll(s); }
+
+function showToast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1500);
+}
+
+function flyStars(count) {
+  const overlay = $('#star-overlay');
+  overlay.classList.add('show');
+  for (let i = 0; i < count; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.textContent = '⭐';
+    star.style.left = (Math.random() * 80 + 10) + '%';
+    star.style.top = (Math.random() * 60 + 20) + '%';
+    star.style.animationDelay = (i * 0.1) + 's';
+    overlay.appendChild(star);
+  }
+  setTimeout(() => { overlay.classList.remove('show'); overlay.innerHTML = ''; }, 1500);
+}
+
+function addStars(n) {
+  DATA.stars += n;
+  saveData();
+  flyStars(n);
+  checkBadges();
+  updateStarBadge();
+}
+
+function updateStarBadge() {
+  const badge = $('#star-badge');
+  if (DATA.stars > 0) {
+    badge.style.display = 'flex';
+    $('#star-num').textContent = DATA.stars;
+  }
+}
+
+// ===== NAVIGATION =====
+function switchPage(page) {
+  $$('.page').forEach(p => p.classList.remove('active'));
+  $('#page-' + page).classList.add('active');
+  $$('.nav-item').forEach(n => n.classList.remove('active'));
+  $$('.nav-item').forEach(n => {
+    if (n.dataset.page === page) n.classList.add('active');
+  });
+  if (page === 'today') renderToday();
+  if (page === 'stats') renderStats();
+}
+
+$$('.nav-item').forEach(n => n.addEventListener('click', () => switchPage(n.dataset.page)));
+
+// ===== TODAY PAGE =====
+function getWeekday() {
+  const days = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+  return days[new Date().getDay()];
+}
+
+function formatDate() {
+  const d = new Date();
+  return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日`;
+}
+
+function renderToday() {
+  $('#today-weekday').textContent = getWeekday();
+  $('#today-date').textContent = formatDate();
+  updateStarBadge();
+
+  const today = getTodayStr();
+  const day = new Date().getDay();
+  const plan = WEEKLY_PLAN[day] || WEEKLY_PLAN[1];
+
+  // Check-in
+  const checkedIn = DATA.checkIns[today];
+  const checkinArea = $('#checkin-area');
+  if (checkedIn) {
+    checkinArea.innerHTML = `<button class="checkin-btn done">✅ 今日已打卡 (连续${DATA.checkInStreak}天)</button>`;
+  } else {
+    checkinArea.innerHTML = `<button class="checkin-btn" id="do-checkin">📌 点击打卡</button>`;
+    $('#do-checkin').addEventListener('click', doCheckIn);
+  }
+
+  // Tasks
+  const taskKey = today;
+  if (!DATA.tasks[taskKey]) DATA.tasks[taskKey] = {};
+  const taskState = DATA.tasks[taskKey];
+
+  let html = '';
+  const subjects = [
+    {key:'chinese', icon:'📖', name:'语文', color:'chinese', items: plan.filter(t=>t.sub==='语文')},
+    {key:'math', icon:'🔢', name:'数学', color:'math', items: plan.filter(t=>t.sub==='数学')},
+    {key:'english', icon:'🔤', name:'英语', color:'english', items: plan.filter(t=>t.sub==='英语')}
+  ];
+
+  let totalDone = 0, totalTasks = 0;
+  subjects.forEach(sub => {
+    html += `<div class="subject-card ${sub.color}">
+      <div class="subject-header">
+        <span class="subject-icon">${sub.icon}</span>
+        <span class="subject-name">${sub.name}</span>
+        <span class="subject-time">${sub.items[0].time}</span>
+      </div>
+      <ul class="task-list">`;
+    sub.items.forEach((task, i) => {
+      const taskId = sub.key + '_' + i;
+      const done = taskState[taskId];
+      if (done) totalDone++;
+      totalTasks++;
+      html += `<li class="task-item">
+        <div class="task-check ${done?'done':''}" data-task="${taskId}">${done?'✓':''}</div>
+        <div class="task-text ${done?'done':''}">${task.name}</div>
+      </li>`;
+    });
+    html += `</ul></div>`;
+  });
+
+  // Progress
+  if (totalTasks > 0) {
+    const pct = totalDone / totalTasks;
+    const offset = 213.6 * (1 - pct);
+    html = `<div class="progress-ring">
+      <svg viewBox="0 0 80 80">
+        <circle class="bg-circle" cx="40" cy="40" r="34"/>
+        <circle class="fg-circle" cx="40" cy="40" r="34" stroke-dasharray="213.6" stroke-dashoffset="${offset}"/>
+      </svg>
+      <div class="progress-text">${totalDone}/${totalTasks}</div>
+    </div>` + html;
+  }
+
+  $('#today-tasks').innerHTML = html;
+
+  // Bind task checks
+  $$('.task-check').forEach(el => el.addEventListener('click', function() {
+    const tid = this.dataset.task;
+    if (!DATA.tasks[taskKey][tid]) {
+      DATA.tasks[taskKey][tid] = true;
+      addStars(1);
+      showToast('完成！+1⭐');
+      saveData();
+    } else {
+      DATA.tasks[taskKey][tid] = false;
+      DATA.stars = Math.max(0, DATA.stars - 1);
+      saveData();
+      updateStarBadge();
+    }
+    renderToday();
+  }));
+}
+
+function doCheckIn() {
+  const today = getTodayStr();
+  if (DATA.checkIns[today]) return;
+
+  DATA.checkIns[today] = true;
+
+  // Calculate streak
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+  if (DATA.checkIns[yesterday]) {
+    DATA.checkInStreak++;
+  } else {
+    DATA.checkInStreak = 1;
+  }
+
+  addStars(2);
+  showToast('打卡成功！+2⭐');
+  saveData();
+  checkBadges();
+  renderToday();
+}
+
+// ===== CHINESE PAGE =====
+let cnCat = 'pinyin';
+
+$$('#cn-tabs .cat-tab').forEach(t => t.addEventListener('click', function() {
+  $$('#cn-tabs .cat-tab').forEach(x => x.classList.remove('active'));
+  this.classList.add('active');
+  cnCat = this.dataset.cat;
+  renderChinese();
+}));
+
+function renderChinese() {
+  const content = $('#cn-content');
+  if (cnCat === 'pinyin') {
+    let html = '<div class="notice">👆 点击任意拼音卡片，听发音并跟读</div>';
+    const cats = [
+      {title:'6个单韵母', data:PINYIN_DATA.finals},
+      {title:'23个声母', data:PINYIN_DATA.initials},
+      {title:'9个复韵母', data:PINYIN_DATA.compound},
+      {title:'9个鼻韵母', data:PINYIN_DATA.nasal},
+      {title:'15个整体认读', data:PINYIN_DATA.whole}
+    ];
+    cats.forEach(c => {
+      html += `<div class="section-title">📝 ${c.title}</div>`;
+      html += '<div class="pinyin-grid">';
+      c.data.forEach(item => {
+        html += `<div class="pinyin-card" data-char="${item.c}" data-p="${item.p}">
+          <div class="pinyin-p">${item.p}</div>
+          <div class="pinyin-c">${item.c}</div>
+          <div class="pinyin-cat">${item.cat}</div>
+        </div>`;
+      });
+      html += '</div>';
+    });
+    content.innerHTML = html;
+    $$('.pinyin-card').forEach(c => c.addEventListener('click', function() {
+      this.classList.add('playing');
+      speak(this.dataset.char, 'zh-CN');
+      setTimeout(() => this.classList.remove('playing'), 500);
+    }));
+
+  } else if (cnCat === 'char') {
+    let html = '<div class="notice">👆 点击生字卡片，听读音、看拼音</div>';
+    const units = {};
+    CHAR_DATA.forEach(c => { if(!units[c.u]) units[c.u]=[]; units[c.u].push(c); });
+    Object.keys(units).forEach(u => {
+      html += `<div class="section-title">📚 第${u}单元生字</div><div class="char-grid">`;
+      units[u].forEach(c => {
+        const learned = DATA.cnLearned.includes(c.c);
+        html += `<div class="char-card" data-char="${c.c}" data-p="${c.p}">
+          <div class="ch">${c.c}${learned?' ⭐':''}</div>
+          <div class="py">${c.p}</div>
+          <div class="meaning">${c.m}</div>
+        </div>`;
+      });
+      html += '</div>';
+    });
+    content.innerHTML = html;
+    $$('.char-card').forEach(c => c.addEventListener('click', function() {
+      this.classList.add('playing');
+      const ch = this.dataset.char;
+      speak(ch, 'zh-CN');
+      setTimeout(() => this.classList.remove('playing'), 500);
+      if (!DATA.cnLearned.includes(ch)) {
+        DATA.cnLearned.push(ch);
+        saveData();
+        addStars(1);
+        showToast('认识新字！+1⭐');
+      }
+    }));
+
+  } else if (cnCat === 'reading') {
+    let html = '<div class="notice">📖 点击朗读内容，跟着一起读</div>';
+    READING_DATA.forEach((r, i) => {
+      html += `<div class="quiz-card">
+        <div class="quiz-q">${i+1}. ${r.title}</div>
+        <div style="font-size:1.05rem; line-height:2; padding:10px; background:var(--bg); border-radius:8px; margin-bottom:10px;">${r.text}</div>
+        <button class="action-btn primary" id="read-${i}">🔊 朗读</button>
+      </div>`;
+    });
+    content.innerHTML = html;
+    READING_DATA.forEach((r, i) => {
+      $('#read-' + i).addEventListener('click', () => speak(r.text, 'zh-CN'));
+    });
+
+  } else if (cnCat === 'writing') {
+    let html = '<div class="notice">✏️ 看笔顺提示，在纸上练习书写</div>';
+    html += '<div class="char-grid">';
+    WRITING_DATA.forEach(w => {
+      const learned = DATA.cnLearned.includes(w.c);
+      html += `<div class="char-card" data-char="${w.c}">
+        <div class="ch">${w.c}</div>
+        <div class="py">${w.p}</div>
+        <div class="meaning">${w.strokes}画</div>
+        <div style="font-size:.65rem; color:var(--math); margin-top:4px; line-height:1.4;">${w.tip}</div>
+      </div>`;
+    });
+    html += '</div>';
+    html += '<div class="section-title" style="margin-top:16px">📝 书写小贴士</div>';
+    html += `<div class="quiz-card">
+      <div style="font-size:.9rem; line-height:1.8;">
+        ✅ 坐姿端正，本子放正<br>
+        ✅ 握笔姿势：拇指食指相对捏，中指托住笔<br>
+        ✅ 按<a href="javascript:void(0)" id="play-stroke">笔顺规则</a>书写：先横后竖、先撇后捺、从上到下、从左到右、先外后内<br>
+        ✅ 每个字写3遍，注意间架结构
+      </div>
+    </div>`;
+    content.innerHTML = html;
+    $$('.char-card').forEach(c => c.addEventListener('click', function() {
+      this.classList.add('playing');
+      speak(this.dataset.char, 'zh-CN');
+      setTimeout(() => this.classList.remove('playing'), 500);
+    }));
+    const ps = $('#play-stroke');
+    if (ps) ps.addEventListener('click', () => speak('先横后竖，先撇后捺，从上到下，从左到右，先外后内', 'zh-CN'));
+  }
+}
+
+// ===== MATH PAGE =====
+let mathCat = 'add10';
+let currentMathQ = null;
+let mathSession = { correct: 0, total: 0 };
+
+$$('#math-tabs .cat-tab').forEach(t => t.addEventListener('click', function() {
+  $$('#math-tabs .cat-tab').forEach(x => x.classList.remove('active'));
+  this.classList.add('active');
+  mathCat = this.dataset.cat;
+  mathSession = { correct: 0, total: 0 };
+  renderMath();
+}));
+
+function genMathProblem(cat) {
+  if (cat === 'add10') {
+    const a = Math.floor(Math.random()*6)+1, b = Math.floor(Math.random()*(10-a))+1;
+    return {q:`${a} + ${b} = ?`, ans:a+b, opts:genOptions(a+b)};
+  }
+  if (cat === 'sub10') {
+    const a = Math.floor(Math.random()*8)+3, b = Math.floor(Math.random()*a)+1;
+    return {q:`${a} − ${b} = ?`, ans:a-b, opts:genOptions(a-b)};
+  }
+  if (cat === 'add20') {
+    const a = Math.floor(Math.random()*10)+5, b = Math.floor(Math.random()*(20-a))+1;
+    if (a+b > 20) return genMathProblem(cat);
+    return {q:`${a} + ${b} = ?`, ans:a+b, opts:genOptions(a+b)};
+  }
+  if (cat === 'sub20') {
+    const a = Math.floor(Math.random()*8)+12, b = Math.floor(Math.random()*(a-2))+2;
+    return {q:`${a} − ${b} = ?`, ans:a-b, opts:genOptions(a-b)};
+  }
+  if (cat === 'shapes') {
+    const shapes = SHAPES_DATA.slice(0, 4);
+    const s = shapes[Math.floor(Math.random()*shapes.length)];
+    const q = `这是什么形状？`;
+    return {q:q, shape:s.emoji, ans:s.name, opts:shapes.map(x=>x.name).sort(()=>Math.random()-0.5)};
+  }
+  if (cat === 'count') {
+    const n = Math.floor(Math.random()*9)+1;
+    const emoji = ['🍎','🍊','🍓','⭐','🌸'][Math.floor(Math.random()*5)];
+    return {q:`数一数，有几个？`, display:emoji.repeat(n), ans:n, opts:genOptions(n, 10)};
+  }
+}
+
+function genOptions(ans, max) {
+  max = max || (ans > 10 ? 20 : 10);
+  const opts = new Set([ans]);
+  while (opts.size < 4) {
+    let r = Math.floor(Math.random()*(max+1));
+    if (r === ans) continue;
+    opts.add(r);
+  }
+  return Array.from(opts).sort(()=>Math.random()-0.5);
+}
+
+function renderMath() {
+  const content = $('#math-content');
+  if (mathCat === 'shapes' || mathCat === 'count') {
+    currentMathQ = genMathProblem(mathCat);
+    let html = `<div class="math-stats">
+      <div class="math-stat"><div class="num" id="ms-correct">${mathSession.correct}</div>✅ 正确</div>
+      <div class="math-stat"><div class="num" id="ms-total">${mathSession.total}</div>📊 已做</div>
+      <div class="math-stat"><div class="num" id="ms-rate">${mathSession.total>0?Math.round(mathSession.correct/mathSession.total*100):0}%</div>📈 正确率</div>
+    </div>`;
+
+    if (mathCat === 'shapes') {
+      html += `<div class="shape-display">
+        <div class="shape-obj">${currentMathQ.shape}</div>
+        <div class="shape-q">${currentMathQ.q}</div>
+        <div class="shape-options">`;
+      currentMathQ.opts.forEach(opt => {
+        html += `<div class="shape-opt" data-ans="${opt}">${opt}</div>`;
+      });
+      html += `</div></div>`;
+    } else {
+      html += `<div class="shape-display">
+        <div class="shape-obj" style="font-size:2.2rem; line-height:2; word-break:break-all; padding:0 10px;">${currentMathQ.display}</div>
+        <div class="shape-q">${currentMathQ.q}</div>
+        <div class="shape-options">`;
+      currentMathQ.opts.forEach(opt => {
+        html += `<div class="shape-opt" data-ans="${opt}">${opt}</div>`;
+      });
+      html += `</div></div>`;
+    }
+    content.innerHTML = html;
+    $$('.shape-opt').forEach(o => o.addEventListener('click', function() {
+      handleMathAnswer(this);
+    }));
+  } else {
+    currentMathQ = genMathProblem(mathCat);
+    let html = `<div class="math-stats">
+      <div class="math-stat"><div class="num" id="ms-correct">${mathSession.correct}</div>✅ 正确</div>
+      <div class="math-stat"><div class="num" id="ms-total">${mathSession.total}</div>📊 已做</div>
+      <div class="math-stat"><div class="num" id="ms-rate">${mathSession.total>0?Math.round(mathSession.correct/mathSession.total*100):0}%</div>📈 正确率</div>
+    </div>`;
+    html += `<div class="math-display">
+      <div class="math-q">${currentMathQ.q}</div>
+      <div class="math-options">`;
+    currentMathQ.opts.forEach(opt => {
+      html += `<div class="math-opt" data-ans="${opt}">${opt}</div>`;
+    });
+    html += `</div></div>`;
+    // Tips
+    const tips = {
+      add10:'💡 小贴士：可以数手指帮忙算！',
+      sub10:'💡 小贴士：减法就是去掉，想一想还剩几个？',
+      add20:'💡 凑十法：先凑十，再加剩！如 9+2: 9+1=10, 10+1=11',
+      sub20:'💡 破十法：先拆十，再减剩！如 15-8: 10-8=2, 5+2=7'
+    };
+    if (tips[mathCat]) html += `<div style="text-align:center; font-size:.85rem; color:var(--muted); padding:8px;">${tips[mathCat]}</div>`;
+    content.innerHTML = html;
+    $$('.math-opt').forEach(o => o.addEventListener('click', function() {
+      handleMathAnswer(this);
+    }));
+  }
+}
+
+function handleMathAnswer(el) {
+  const userAns = el.dataset.ans;
+  const correctAns = String(currentMathQ.ans);
+  mathSession.total++;
+  DATA.mathTotal++;
+  const isCorrect = userAns === correctAns;
+
+  if (isCorrect) {
+    mathSession.correct++;
+    DATA.mathCorrect++;
+    el.classList.add('correct');
+    showToast('✅ 答对了！');
+    if (mathSession.total % 5 === 0) {
+      addStars(1);
+    }
+  } else {
+    el.classList.add('wrong');
+    $$('.math-opt, .shape-opt').forEach(o => {
+      if (String(o.dataset.ans) === correctAns) o.classList.add('correct');
+    });
+    showToast('❌ 再想想，正确答案是 ' + correctAns);
+  }
+  saveData();
+  checkBadges();
+
+  // Update stats
+  $('#ms-correct').textContent = mathSession.correct;
+  $('#ms-total').textContent = mathSession.total;
+  $('#ms-rate').textContent = Math.round(mathSession.correct/mathSession.total*100) + '%';
+
+  setTimeout(() => renderMath(), 1200);
+}
+
+// ===== ENGLISH PAGE =====
+let enCat = 'alphabet';
+
+$$('#en-tabs .cat-tab').forEach(t => t.addEventListener('click', function() {
+  $$('#en-tabs .cat-tab').forEach(x => x.classList.remove('active'));
+  this.classList.add('active');
+  enCat = this.dataset.cat;
+  renderEnglish();
+}));
+
+function renderEnglish() {
+  const content = $('#en-content');
+
+  if (enCat === 'alphabet') {
+    let html = '<div class="notice">👆 点击字母卡片，听发音和单词</div>';
+    html += '<div class="pinyin-grid" style="grid-template-columns:repeat(auto-fill,minmax(90px,1fr))">';
+    ALPHABET.forEach(a => {
+      html += `<div class="pinyin-card" data-letter="${a.l}" data-word="${a.w}">
+        <div class="pinyin-p" style="color:var(--english)">${a.l}</div>
+        <div class="pinyin-c" style="font-size:1.4rem">${a.emoji}</div>
+        <div style="font-size:.75rem; color:var(--ink)">${a.w}</div>
+        <div style="font-size:.65rem; color:var(--muted)">${a.cn}</div>
+      </div>`;
+    });
+    html += '</div>';
+    // ABC Song
+    html += `<div class="quiz-card" style="margin-top:16px">
+      <div class="quiz-q">🎵 ABC字母歌</div>
+      <div style="font-size:.85rem; color:var(--muted); margin-bottom:10px">听一听，跟着唱</div>
+      <button class="action-btn primary" id="abc-song">▶️ 播放</button>
+    </div>`;
+    content.innerHTML = html;
+    $$('.pinyin-card').forEach(c => c.addEventListener('click', function() {
+      this.classList.add('playing');
+      const letter = this.dataset.letter;
+      const word = this.dataset.word;
+      speakEn(letter);
+      setTimeout(() => speakEn(word), 800);
+      setTimeout(() => this.classList.remove('playing'), 1500);
+    }));
+    $('#abc-song').addEventListener('click', () => {
+      speakEn('A B C D E F G, H I J K L M N, O P Q, R S T, U V W, X Y Z. Now I know my ABCs, next time won\'t you sing with me.');
+    });
+
+  } else {
+    const vocab = EN_VOCAB[enCat] || [];
+    const catName = {greetings:'问候', family:'家庭', animals:'动物', numbers:'数字', colors:'颜色', classroom:'课堂'}[enCat] || '';
+    let html = `<div class="notice">👆 点击卡片，听英语发音</div>`;
+
+    // Flashcard mode
+    html += `<div class="section-title">🃏 ${catName}词汇卡片</div>`;
+    html += `<div class="flash-area"><div class="flash-card" id="flash-card">
+      <div class="flash-front">
+        <div class="big" id="flash-emoji">📚</div>
+        <div class="hint">点击翻面看中文</div>
+      </div>
+      <div class="flash-back">
+        <div class="big" id="flash-en">word</div>
+        <div class="sub" id="flash-cn">中文</div>
+        <div class="py" id="flash-ph">/phon/</div>
+      </div>
+    </div></div>`;
+    html += `<div class="flash-nav">
+      <button class="action-btn outline" id="flash-prev">◀ 上一个</button>
+      <span class="flash-progress" id="flash-prog">1/${vocab.length}</span>
+      <button class="action-btn outline" id="flash-next">下一个 ▶</button>
+    </div>`;
+    html += `<button class="action-btn accent" style="width:100%; margin-bottom:16px" id="flash-speak">🔊 听发音</button>`;
+
+    // All vocab grid
+    html += `<div class="section-title">📋 全部词汇</div>`;
+    html += '<div class="char-grid">';
+    vocab.forEach(v => {
+      const learned = DATA.enLearned.includes(v.en);
+      html += `<div class="char-card" data-en="${v.en}" data-cn="${v.cn}" data-ph="${v.ph}">
+        <div class="ch" style="font-size:1.8rem">${v.emoji}</div>
+        <div class="py" style="color:var(--english)">${v.en}${learned?' ⭐':''}</div>
+        <div class="meaning">${v.cn}</div>
+      </div>`;
+    });
+    html += '</div>';
+
+    // Quiz
+    html += `<div class="section-title" style="margin-top:16px">🎯 趣味选择题</div>`;
+    const quizVocab = vocab.slice(0, Math.min(5, vocab.length));
+    let quizIdx = 0;
+    html += `<div id="en-quiz-area"></div>`;
+    content.innerHTML = html;
+
+    // Flashcard logic
+    let flashIdx = 0;
+    const flashCard = $('#flash-card');
+    function updateFlash() {
+      const v = vocab[flashIdx];
+      $('#flash-emoji').textContent = v.emoji;
+      $('#flash-en').textContent = v.en;
+      $('#flash-cn').textContent = v.cn;
+      $('#flash-ph').textContent = v.ph;
+      $('#flash-prog').textContent = `${flashIdx+1}/${vocab.length}`;
+      flashCard.classList.remove('flipped');
+    }
+    updateFlash();
+    flashCard.addEventListener('click', () => flashCard.classList.toggle('flipped'));
+    $('#flash-prev').addEventListener('click', () => { flashIdx = (flashIdx-1+vocab.length)%vocab.length; updateFlash(); });
+    $('#flash-next').addEventListener('click', () => { flashIdx = (flashIdx+1)%vocab.length; updateFlash(); });
+    $('#flash-speak').addEventListener('click', () => speakEn(vocab[flashIdx].en));
+
+    // Vocab card click
+    $$('.char-card').forEach(c => c.addEventListener('click', function() {
+      this.classList.add('playing');
+      speakEn(this.dataset.en);
+      setTimeout(() => this.classList.remove('playing'), 500);
+      if (!DATA.enLearned.includes(this.dataset.en)) {
+        DATA.enLearned.push(this.dataset.en);
+        saveData();
+        addStars(1);
+        showToast('学会新词！+1⭐');
+        checkBadges();
+      }
+    }));
+
+    // Quiz
+    function renderEnQuiz() {
+      if (quizIdx >= quizVocab.length) {
+        $('#en-quiz-area').innerHTML = `<div class="quiz-card"><div style="text-align:center; font-size:1.1rem; color:var(--success); font-weight:700">🎉 全部完成！</div></div>`;
+        return;
+      }
+      const v = quizVocab[quizIdx];
+      const wrong = vocab.filter(x => x.en !== v.en).sort(() => Math.random()-0.5).slice(0, 3);
+      const opts = [v, ...wrong].sort(() => Math.random()-0.5);
+      let qhtml = `<div class="quiz-card">
+        <div class="quiz-q">${quizIdx+1}. "${v.cn}" 用英语怎么说？</div>
+        <div class="quiz-options">`;
+      opts.forEach(o => {
+        qhtml += `<div class="quiz-opt" data-en="${o.en}">${o.emoji} ${o.en}</div>`;
+      });
+      qhtml += `</div><div class="quiz-feedback" id="quiz-fb"></div></div>`;
+      $('#en-quiz-area').innerHTML = qhtml;
+      $$('#en-quiz-area .quiz-opt').forEach(o => o.addEventListener('click', function() {
+        if (this.classList.contains('correct') || this.classList.contains('wrong')) return;
+        if (this.dataset.en === v.en) {
+          this.classList.add('correct');
+          $('#quiz-fb').textContent = '✅ 太棒了！';
+          speakEn(v.en);
+          quizIdx++;
+          setTimeout(renderEnQuiz, 1000);
+        } else {
+          this.classList.add('wrong');
+          $$('#en-quiz-area .quiz-opt').forEach(x => { if(x.dataset.en===v.en) x.classList.add('correct'); });
+          $('#quiz-fb').textContent = '❌ 正确答案: ' + v.en;
+          setTimeout(() => { quizIdx++; renderEnQuiz(); }, 1500);
+        }
+      }));
+    }
+    renderEnQuiz();
+  }
+}
+
+// ===== STATS PAGE =====
+function renderStats() {
+  $('#stat-stars').textContent = DATA.stars;
+  $('#stat-streak').textContent = DATA.checkInStreak;
+  $('#stat-cn').textContent = DATA.cnLearned.length;
+  $('#stat-math').textContent = DATA.mathTotal;
+
+  // Badges
+  let bhtml = '';
+  BADGES.forEach(b => {
+    let val = 0;
+    if (b.type === 'checkin') val = DATA.checkInStreak;
+    else if (b.type === 'stars') val = DATA.stars;
+    else if (b.type === 'cnchars') val = DATA.cnLearned.length;
+    else if (b.type === 'mathcount') val = DATA.mathTotal;
+    else if (b.type === 'enwords') val = DATA.enLearned.length;
+    const earned = val >= b.cond;
+    bhtml += `<div class="badge ${earned?'':'locked'}">
+      <div class="icon">${earned?b.icon:'🔒'}</div>
+      <div class="name">${b.name}</div>
+    </div>`;
+  });
+  $('#badge-list').innerHTML = bhtml;
+
+  // Reminder
+  let rhtml = `<div class="reminder-bar">
+    <div>
+      <div style="font-weight:700; font-size:.9rem; margin-bottom:4px">⏰ 每日打卡提醒</div>
+      <div class="text">每天 <input type="time" class="time-input" id="reminder-time" value="${DATA.reminder.time}"> 提醒我学习</div>
+    </div>
+    <div class="toggle-switch ${DATA.reminder.enabled?'on':''}" id="reminder-toggle"></div>
+  </div>`;
+  $('#reminder-section').innerHTML = rhtml;
+
+  $('#reminder-toggle').addEventListener('click', function() {
+    DATA.reminder.enabled = !DATA.reminder.enabled;
+    this.classList.toggle('on');
+    saveData();
+    if (DATA.reminder.enabled) {
+      showToast('已开启打卡提醒');
+      setupReminder();
+    } else {
+      showToast('已关闭打卡提醒');
+    }
+  });
+  $('#reminder-time').addEventListener('change', function() {
+    DATA.reminder.time = this.value;
+    saveData();
+  });
+
+  // Weekly plan
+  const today = new Date().getDay();
+  let phtml = '<table class="plan-table"><thead><tr><th>日</th><th>语文</th><th>数学</th><th>英语</th></tr></thead><tbody>';
+  const dayNames = ['日','一','二','三','四','五','六'];
+  const dayOrder = [1,2,3,4,5,6,0];
+  dayOrder.forEach(d => {
+    const plan = WEEKLY_PLAN[d] || [];
+    const isToday = d === today;
+    phtml += `<tr class="${isToday?'today-row':''}">`;
+    phtml += `<td class="day-cell">周${dayNames[d]}${isToday?'⭐':''}</td>`;
+    const cn = plan.find(t=>t.sub==='语文');
+    const ma = plan.find(t=>t.sub==='数学');
+    const en = plan.find(t=>t.sub==='英语');
+    phtml += `<td class="sub-chinese">${cn?cn.name:'—'}<br><span style="font-size:.7rem; color:var(--muted)">${cn?cn.time:''}</span></td>`;
+    phtml += `<td class="sub-math">${ma?ma.name:'—'}<br><span style="font-size:.7rem; color:var(--muted)">${ma?ma.time:''}</span></td>`;
+    phtml += `<td class="sub-english">${en?en.name:'—'}<br><span style="font-size:.7rem; color:var(--muted)">${en?en.time:''}</span></td>`;
+    phtml += `</tr>`;
+  });
+  phtml += '</tbody></table>';
+  $('#plan-section').innerHTML = phtml;
+}
+
+function checkBadges() {
+  let earned = false;
+  BADGES.forEach(b => {
+    let val = 0;
+    if (b.type === 'checkin') val = DATA.checkInStreak;
+    else if (b.type === 'stars') val = DATA.stars;
+    else if (b.type === 'cnchars') val = DATA.cnLearned.length;
+    else if (b.type === 'mathcount') val = DATA.mathTotal;
+    else if (b.type === 'enwords') val = DATA.enLearned.length;
+    if (val >= b.cond && !DATA.badges.includes(b.id)) {
+      DATA.badges.push(b.id);
+      showToast(`🎉 获得新勋章: ${b.name}！`);
+      earned = true;
+    }
+  });
+  saveData();
+  if (earned && $('#page-stats').classList.contains('active')) renderStats();
+}
+
+// ===== REMINDER =====
+function setupReminder() {
+  if (!DATA.reminder.enabled) return;
+  const now = new Date();
+  const [h, m] = DATA.reminder.time.split(':').map(Number);
+  const target = new Date();
+  target.setHours(h, m, 0, 0);
+  if (target <= now) target.setDate(target.getDate() + 1);
+  const delay = target - now;
+  setTimeout(() => {
+    if (DATA.reminder.enabled) {
+      const today = getTodayStr();
+      if (!DATA.checkIns[today]) {
+        if ('Notification' in window && Notification.permission === 'granted') {
+          new Notification('一年级学习', { body: '该学习啦！快来打卡完成今天的任务吧~ ⭐' });
+        }
+        if ($('#page-today').classList.contains('active')) {
+          showToast('⏰ 该学习啦！快来打卡！');
+        }
+      }
+      setupReminder();
+    }
+  }, Math.min(delay, 60000 * 60));
+  // Check every minute if reminder time reached
+  if ('Notification' in window && Notification.permission === 'default' && DATA.reminder.enabled) {
+    Notification.requestPermission();
+  }
+}
+
+// Check reminder every minute
+setInterval(() => {
+  if (!DATA.reminder.enabled) return;
+  const now = new Date();
+  const [h, m] = DATA.reminder.time.split(':').map(Number);
+  if (now.getHours() === h && now.getMinutes() === m) {
+    const today = getTodayStr();
+    if (!DATA.checkIns[today]) {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('一年级学习', { body: '该学习啦！快来打卡完成今天的任务吧~ ⭐' });
+      }
+      showToast('⏰ 该学习啦！快来打卡！');
+    }
+  }
+}, 60000);
+
+// ===== INIT =====
+function init() {
+  renderToday();
+  renderChinese();
+  renderEnglish();
+  updateStarBadge();
+  setupReminder();
+  if ('Notification' in window && Notification.permission === 'default' && DATA.reminder.enabled) {
+    Notification.requestPermission();
+  }
+}
+
+init();
+</script>
+</body>
+</html>
