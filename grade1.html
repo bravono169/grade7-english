@@ -338,6 +338,17 @@ body {
   <div class="badge-list" id="badge-list"></div>
   <div class="section-title">📅 本周计划</div>
   <div id="plan-section"></div>
+  <div class="section-title">📦 数据迁移</div>
+  <p style="font-size:0.78rem;color:#999;margin:0.5rem 0">从旧站点迁移打卡数据</p>
+  <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+    <button onclick="exportData()" style="flex:1;padding:0.6rem;border:none;border-radius:10px;background:#4A9D8A;color:white;font-size:0.78rem">📤 导出数据</button>
+    <button onclick="showImportBox()" style="flex:1;padding:0.6rem;border:none;border-radius:10px;background:#7C5BAC;color:white;font-size:0.78rem">📥 导入数据</button>
+  </div>
+  <textarea id="import-box" placeholder="将旧站点导出的数据粘贴到这里..." style="display:none;width:100%;min-height:100px;margin-top:0.5rem;border:1px solid #ddd;border-radius:8px;padding:0.5rem;font-size:0.75rem;font-family:monospace;resize:vertical"></textarea>
+  <div id="import-actions" style="display:none;gap:0.5rem;margin-top:0.5rem">
+    <button onclick="doImport()" style="flex:1;padding:0.6rem;border:none;border-radius:10px;background:#7C5BAC;color:white;font-size:0.78rem">确认导入</button>
+    <button onclick="document.getElementById('import-box').style.display='none';document.getElementById('import-actions').style.display='none'" style="flex:1;padding:0.6rem;border:none;border-radius:10px;background:#ccc;color:white;font-size:0.78rem">取消</button>
+  </div>
 </div>
 
 <!-- Nav bar -->
@@ -1339,6 +1350,62 @@ function init() {
   setupReminder();
   if ('Notification' in window && Notification.permission === 'default' && DATA.reminder.enabled) {
     Notification.requestPermission();
+  }
+}
+
+// ==================== DATA MIGRATION ====================
+function exportData() {
+  const raw = localStorage.getItem(STORE_KEY);
+  if (!raw) { showToast('暂无可导出的数据'); return; }
+  const encoded = btoa(unescape(encodeURIComponent(raw)));
+  const box = document.getElementById('import-box');
+  box.value = encoded;
+  box.style.display = 'block';
+  box.readOnly = true;
+  box.select();
+  document.execCommand('copy');
+  showToast('数据已导出并复制到剪贴板！');
+  setTimeout(function(){ box.readOnly = false; }, 1000);
+}
+function showImportBox() {
+  const box = document.getElementById('import-box');
+  box.value = '';
+  box.readOnly = false;
+  box.style.display = 'block';
+  document.getElementById('import-actions').style.display = 'flex';
+}
+function doImport() {
+  const box = document.getElementById('import-box');
+  const val = box.value.trim();
+  if (!val) { showToast('请先粘贴数据'); return; }
+  try {
+    const decoded = decodeURIComponent(escape(atob(val)));
+    const parsed = JSON.parse(decoded);
+    if (typeof parsed !== 'object') { throw new Error('格式不对'); }
+    Object.keys(parsed).forEach(function(key) {
+      if (typeof DATA[key] === 'object' && !Array.isArray(DATA[key]) && DATA[key] !== null) {
+        Object.keys(parsed[key] || {}).forEach(function(k) { DATA[key][k] = parsed[key][k]; });
+      } else if (Array.isArray(DATA[key])) {
+        (parsed[key] || []).forEach(function(item) {
+          if (!DATA[key].some(function(x) { return JSON.stringify(x) === JSON.stringify(item); })) {
+            DATA[key].push(item);
+          }
+        });
+      } else {
+        if (DATA[key] === undefined || DATA[key] === null || DATA[key] === '' || DATA[key] === 0) {
+          DATA[key] = parsed[key];
+        } else if (typeof parsed[key] === 'number' && parsed[key] > (DATA[key] || 0)) {
+          DATA[key] = parsed[key];
+        }
+      }
+    });
+    saveData();
+    box.style.display = 'none';
+    document.getElementById('import-actions').style.display = 'none';
+    renderToday(); renderStats();
+    showToast('数据导入成功！打卡记录已迁移');
+  } catch(e) {
+    showToast('数据格式错误，请检查后重试');
   }
 }
 
