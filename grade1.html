@@ -1438,7 +1438,41 @@ function doImport() {
   }
 }
 
+// ==================== AUTO MIGRATION ====================
+function checkUrlMigration() {
+  var params = new URLSearchParams(window.location.search);
+  var migrateData = params.get('migrate');
+  if (!migrateData) return;
+  try {
+    var decoded = decodeURIComponent(escape(atob(migrateData)));
+    var parsed = JSON.parse(decoded);
+    if (typeof parsed !== 'object') { throw new Error('invalid'); }
+    Object.keys(parsed).forEach(function(key) {
+      if (typeof DATA[key] === 'object' && !Array.isArray(DATA[key]) && DATA[key] !== null) {
+        Object.keys(parsed[key] || {}).forEach(function(k) { DATA[key][k] = parsed[key][k]; });
+      } else if (Array.isArray(DATA[key])) {
+        (parsed[key] || []).forEach(function(item) {
+          if (!DATA[key].some(function(x) { return JSON.stringify(x) === JSON.stringify(item); })) DATA[key].push(item);
+        });
+      } else {
+        if (DATA[key] === undefined || DATA[key] === null || DATA[key] === '' || DATA[key] === 0) DATA[key] = parsed[key];
+        else if (typeof parsed[key] === 'number' && parsed[key] > (DATA[key] || 0)) DATA[key] = parsed[key];
+      }
+    });
+    saveData();
+    renderToday(); renderStats();
+    showToast('✅ 旧站数据已成功导入！');
+    setTimeout(function() {
+      var url = window.location.pathname;
+      window.history.replaceState({}, '', url);
+    }, 500);
+  } catch(e) {
+    showToast('数据导入失败');
+  }
+}
+
 init();
+checkUrlMigration();
 </script>
 </body>
 </html>
