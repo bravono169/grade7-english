@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>数据迁移中转</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,system-ui,sans-serif;background:#f5f5f5;color:#333;line-height:1.6;padding:env(safe-area-inset-top) 1rem env(safe-area-inset-bottom)}
+.container{max-width:500px;margin:0 auto;padding:1.5rem 1rem}
+.card{background:white;border-radius:14px;padding:1.5rem;margin-bottom:1rem;box-shadow:0 2px 12px rgba(0,0,0,0.08)}
+h2{font-size:1.2rem;margin-bottom:0.8rem}
+p{font-size:0.88rem;color:#666;margin-bottom:0.6rem}
+.app-btn{display:block;width:100%;padding:1rem;border:none;border-radius:12px;font-size:0.95rem;text-align:center;text-decoration:none;margin-bottom:0.8rem;cursor:pointer}
+.app-en{background:linear-gradient(135deg,#7C5BAC,#9B6BC4);color:white}
+.app-g1{background:linear-gradient(135deg,#4A9D8A,#5FB39E);color:white}
+.step{display:flex;gap:0.5rem;margin-bottom:0.5rem;align-items:flex-start}
+.step-num{background:#7C5BAC;color:white;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;flex-shrink:0;margin-top:2px}
+.step-text{font-size:0.82rem;color:#555}
+.step-text b{color:#333}
+.notice{background:#D4EDDA;border:1px solid #C3E6CB;border-radius:8px;padding:0.8rem;font-size:0.82rem;color:#155724;margin-bottom:0.8rem}
+.warning{background:#FFF3CD;border:1px solid #FFE69C;border-radius:8px;padding:0.8rem;font-size:0.82rem;color:#856404;margin-bottom:0.8rem}
+.toast{position:fixed;bottom:30%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);color:white;padding:0.8rem 1.5rem;border-radius:25px;font-size:0.85rem;z-index:9999;opacity:0;transition:opacity 0.3s}
+.toast.show{opacity:1}
+#result-box{display:none}
+.spinner{display:inline-block;width:20px;height:20px;border:3px solid #f3f3f3;border-top:3px solid #7C5BAC;border-radius:50%;animation:spin 1s linear infinite;margin-right:0.5rem;vertical-align:middle}
+@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="card">
+    <h2>📦 打卡数据迁移</h2>
+    <p>将旧站点（surge.sh）的打卡数据自动导入到新站点（GitHub Pages）</p>
+    <div class="notice">✅ Surge.sh 已恢复！现在可以迁移数据了</div>
+    <div class="warning">⚠️ 请用<strong>之前打卡的同一手机浏览器</strong>打开本页面，数据存在该浏览器中</div>
+  </div>
+
+  <div class="card">
+    <h2>选择要迁移的应用</h2>
+    <a href="javascript:void(doMigrate('enTrainer_v3','english'))" class="app-btn app-en">📝 七年级英语训练</a>
+    <a href="javascript:void(doMigrate('grade1_app_data','grade1'))" class="app-btn app-g1">📚 一年级学习计划</a>
+    <a href="javascript:void(doMigrateAll())" class="app-btn" style="background:linear-gradient(135deg,#3B82F6,#5B9BF6);color:white">🔄 全部迁移</a>
+  </div>
+
+  <div class="card" id="result-box">
+    <h2 id="result-title">迁移结果</h2>
+    <div id="result-content"></div>
+  </div>
+
+  <div class="card">
+    <div class="step"><div class="step-num">1</div><div class="step-text">点击上方按钮，系统自动读取本浏览器的旧数据</div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-text">数据将通过 URL 参数传递到新站点</div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-text">新站点自动接收并合并数据</div></div>
+    <div class="step"><div class="step-num">4</div><div class="step-text">迁移完成后可在新站点继续打卡</div></div>
+  </div>
+
+  <div class="card">
+    <p style="text-align:center;font-size:0.78rem;color:#999">如果显示"无数据"，说明本浏览器之前没有在 surge.sh 上使用过该小程序。请用之前打卡的手机浏览器打开本页面。</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2500);
+}
+
+function doMigrate(storeKey, appName) {
+  var raw = localStorage.getItem(storeKey);
+  if (!raw || raw === '{}' || raw === 'null') {
+    showToast('未找到' + (appName === 'english' ? '七年级英语' : '一年级') + '的数据');
+    showResult(appName, false, '本浏览器中没有找到旧数据。请确认是用之前打卡的同一浏览器打开的。');
+    return;
+  }
+  try {
+    var parsed = JSON.parse(raw);
+    var taskCount = Object.keys(parsed.tasks || parsed.checkIns || {}).length;
+    if (taskCount === 0 && (!parsed.vocabProgress || Object.keys(parsed.vocabProgress).length === 0)) {
+      showToast('数据为空');
+      showResult(appName, false, '旧数据为空，无需迁移。');
+      return;
+    }
+    var encoded = btoa(unescape(encodeURIComponent(raw)));
+    if (encoded.length > 30000) {
+      showToast('数据量较大，正在迁移...');
+    } else {
+      showToast('正在迁移...');
+    }
+    var targetUrl;
+    if (appName === 'english') {
+      targetUrl = 'https://bravono169.github.io/grade7-english/english.html?migrate=' + encodeURIComponent(encoded);
+    } else {
+      targetUrl = 'https://bravono169.github.io/grade7-english/grade1.html?migrate=' + encodeURIComponent(encoded);
+    }
+    showResult(appName, true, '找到 ' + taskCount + ' 条打卡记录，正在跳转到新站点导入...');
+    setTimeout(function() { window.location.href = targetUrl; }, 1000);
+  } catch(e) {
+    showToast('数据解析失败');
+    showResult(appName, false, '数据格式错误：' + e.message);
+  }
+}
+
+function doMigrateAll() {
+  var en = localStorage.getItem('enTrainer_v3');
+  var g1 = localStorage.getItem('grade1_app_data');
+  if ((!en || en === '{}') && (!g1 || g1 === '{}')) {
+    showToast('未找到任何旧数据');
+    showResult('all', false, '本浏览器中没有找到任何旧数据。');
+    return;
+  }
+  var results = [];
+  var delay = 0;
+  if (en && en !== '{}' && en !== 'null') {
+    try {
+      var parsed = JSON.parse(en);
+      var count = Object.keys(parsed.tasks || parsed.checkIns || {}).length;
+      results.push('七年级英语：' + count + ' 条记录');
+    } catch(e) { results.push('七年级英语：数据损坏'); }
+  }
+  if (g1 && g1 !== '{}' && g1 !== 'null') {
+    try {
+      var parsed2 = JSON.parse(g1);
+      var count2 = Object.keys(parsed2.tasks || parsed2.stars || {}).length;
+      results.push('一年级：' + count2 + ' 条记录');
+    } catch(e) { results.push('一年级：数据损坏'); }
+  }
+  if (en && en !== '{}' && en !== 'null') {
+    var encoded = btoa(unescape(encodeURIComponent(en)));
+    var url = 'https://bravono169.github.io/grade7-english/english.html?migrate=' + encodeURIComponent(encoded);
+    showResult('all', true, results.join('，') + '。正在跳转迁移七年级英语...');
+    setTimeout(function() { window.location.href = url; }, 1500);
+  } else if (g1 && g1 !== '{}' && g1 !== 'null') {
+    var encoded2 = btoa(unescape(encodeURIComponent(g1)));
+    var url2 = 'https://bravono169.github.io/grade7-english/grade1.html?migrate=' + encodeURIComponent(encoded2);
+    showResult('all', true, results.join('，') + '。正在跳转迁移一年级...');
+    setTimeout(function() { window.location.href = url2; }, 1500);
+  }
+}
+
+function showResult(app, success, msg) {
+  var box = document.getElementById('result-box');
+  var title = document.getElementById('result-title');
+  var content = document.getElementById('result-content');
+  box.style.display = 'block';
+  var appName = app === 'english' ? '七年级英语' : (app === 'grade1' ? '一年级' : '全部');
+  title.innerHTML = (success ? '⏳ ' : '⚠️ ') + appName + '迁移';
+  content.innerHTML = '<p style="font-size:0.85rem;color:' + (success ? '#155724' : '#856404') + '">' + msg + '</p>';
+}
+</script>
+</body>
+</html>
