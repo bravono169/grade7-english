@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>数据恢复工具</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,system-ui,sans-serif;background:#f5f5f5;color:#333;line-height:1.6;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+.container{max-width:600px;margin:0 auto;padding:1rem}
+.card{background:white;border-radius:12px;padding:1.2rem;margin-bottom:1rem;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+.card h2{font-size:1.1rem;margin-bottom:0.8rem}
+.step{display:flex;gap:0.6rem;margin-bottom:0.8rem;align-items:flex-start}
+.step-num{background:#7C5BAC;color:white;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;flex-shrink:0;margin-top:2px}
+.step-text{font-size:0.88rem;color:#555}
+.step-text b{color:#333}
+.bookmarklet{display:inline-block;background:#7C5BAC;color:white;padding:0.8rem 1.2rem;border-radius:10px;text-decoration:none;font-size:0.85rem;margin:0.5rem 0;word-break:break-all}
+.bookmarklet:active{opacity:0.7}
+.code-box{background:#1a1a1a;color:#0f0;border-radius:8px;padding:0.8rem;font-size:0.72rem;font-family:monospace;word-break:break-all;margin:0.5rem 0;user-select:all;-webkit-user-select:all}
+.btn{display:block;width:100%;padding:0.8rem;border:none;border-radius:10px;font-size:0.9rem;text-align:center;cursor:pointer;margin-top:0.5rem}
+.btn-primary{background:#7C5BAC;color:white}
+.btn-green{background:#4A9D8A;color:white}
+.btn-blue{background:#3B82F6;color:white}
+textarea{width:100%;min-height:120px;border:2px solid #ddd;border-radius:8px;padding:0.6rem;font-size:0.78rem;font-family:monospace;resize:vertical;margin-top:0.5rem}
+.toast{position:fixed;bottom:30%;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);color:white;padding:0.6rem 1.2rem;border-radius:20px;font-size:0.85rem;z-index:9999;opacity:0;transition:opacity 0.3s}
+.toast.show{opacity:1}
+.notice{background:#FFF3CD;border:1px solid #FFE69C;border-radius:8px;padding:0.8rem;font-size:0.82rem;color:#856404;margin-bottom:0.8rem}
+.notice-blue{background:#D1ECF9;border:1px solid #B8DAF3;border-radius:8px;padding:0.8rem;font-size:0.82rem;color:#0C5464;margin-bottom:0.8rem}
+.link{color:#3B82F6;text-decoration:none;word-break:break-all}
+.tabs{display:flex;gap:0.5rem;margin-bottom:1rem}
+.tab{flex:1;padding:0.6rem;text-align:center;border-radius:8px;font-size:0.85rem;cursor:pointer;border:2px solid transparent}
+.tab.active{background:#7C5BAC;color:white}
+.tab.inactive{background:#e0e0e0;color:#666}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="card">
+    <h2>📦 打卡数据恢复工具</h2>
+    <div class="notice-blue">
+      您的打卡数据存储在手机浏览器的本地存储中，即使服务器宕机，<b>数据不会丢失</b>。请按以下步骤操作。
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" id="tab-eng" onclick="switchTab('eng')">七年级英语</div>
+    <div class="tab inactive" id="tab-g1" onclick="switchTab('g1')">一年级</div>
+  </div>
+
+  <div id="content-eng">
+    <div class="card">
+      <h2>📱 方法一：手机浏览器恢复</h2>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">在手机浏览器地址栏输入旧网址：<br><b>grade1-english-apps.surge.sh/english.html</b></div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">如果页面能打开（浏览器缓存），继续下一步。如果打不开，跳到<b>方法二</b></div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">在地址栏输入以下代码（注意要加 <b>javascript:</b> 前缀），然后按前往/回车：</div>
+      </div>
+      <div class="code-box" id="js-code-eng">javascript:void(prompt('复制以下数据:',btoa(unescape(encodeURIComponent(localStorage.getItem('enTrainer_v3')||'{}')))))</div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-text">弹出框中的文字就是您的数据，<b>长按全选→复制</b></div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-text">打开新网址，到统计页底部"导入数据"，粘贴并确认</div>
+      </div>
+      <a href="https://bravono169.github.io/grade7-english/english.html" class="link" style="font-size:0.82rem">→ 打开新网址（七年级英语）</a>
+    </div>
+
+    <div class="card">
+      <h2>💻 方法二：电脑浏览器恢复</h2>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">如果您之前在电脑浏览器上用过这个小程序，数据可能还在</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">在电脑浏览器打开旧网址（如果打不开说明缓存已过期）：</div>
+      </div>
+      <a href="http://grade1-english-apps.surge.sh/english.html" class="link" style="font-size:0.82rem">grade1-english-apps.surge.sh/english.html</a>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">如果打开了，按 <b>F12</b> 打开开发者工具，切到 <b>Console</b> 标签</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-text">粘贴以下代码并回车：</div>
+      </div>
+      <div class="code-box">copy(btoa(unescape(encodeURIComponent(localStorage.getItem('enTrainer_v3')||'{}'))))</div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-text">数据已复制到剪贴板，到新站点导入即可</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📥 直接导入数据</h2>
+      <p style="font-size:0.82rem;color:#888;margin-bottom:0.5rem">将导出的数据粘贴到下方，选择对应应用后导入</p>
+      <textarea id="import-box" placeholder="将复制的数据粘贴到这里..."></textarea>
+      <button class="btn btn-green" onclick="importToEnglish()">导入到七年级英语</button>
+      <div id="import-result" style="font-size:0.82rem;margin-top:0.5rem"></div>
+    </div>
+  </div>
+
+  <div id="content-g1" style="display:none">
+    <div class="card">
+      <h2>📱 手机浏览器恢复</h2>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">在手机浏览器输入：<br><b>grade1-english-apps.surge.sh/grade1.html</b></div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">如果页面能打开，在地址栏输入以下代码：</div>
+      </div>
+      <div class="code-box">javascript:void(prompt('复制以下数据:',btoa(unescape(encodeURIComponent(localStorage.getItem('grade1_app_data')||'{}')))))</div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">弹出框中长按全选→复制</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-text">打开新网址，到成就页底部导入</div>
+      </div>
+      <a href="https://bravono169.github.io/grade7-english/grade1.html" class="link" style="font-size:0.82rem">→ 打开新网址（一年级）</a>
+    </div>
+
+    <div class="card">
+      <h2>📥 直接导入数据</h2>
+      <p style="font-size:0.82rem;color:#888;margin-bottom:0.5rem">将导出的数据粘贴到下方</p>
+      <textarea id="import-box-g1" placeholder="将复制的数据粘贴到这里..."></textarea>
+      <button class="btn btn-green" onclick="importToGrade1()">导入到一年级</button>
+      <div id="import-result-g1" style="font-size:0.82rem;margin-top:0.5rem"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>❓ 恢复失败怎么办？</h2>
+    <div class="notice">
+      如果旧网址完全打不开（无缓存），数据暂时无法恢复。但可以等 Surge.sh 服务器恢复后重试。你的数据在手机浏览器中不会丢失，只是暂时访问不到。
+    </div>
+    <p style="font-size:0.82rem;color:#888">建议直接在新站点重新开始打卡，旧数据等 Surge.sh 恢复后再补充导入（数据会自动合并，不会覆盖新记录）。</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function switchTab(tab) {
+  document.getElementById('tab-eng').className = tab === 'eng' ? 'tab active' : 'tab inactive';
+  document.getElementById('tab-g1').className = tab === 'g1' ? 'tab active' : 'tab inactive';
+  document.getElementById('content-eng').style.display = tab === 'eng' ? 'block' : 'none';
+  document.getElementById('content-g1').style.display = tab === 'g1' ? 'block' : 'none';
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2500);
+}
+
+function importToEnglish() {
+  var val = document.getElementById('import-box').value.trim();
+  if (!val) { showToast('请先粘贴数据'); return; }
+  try {
+    var decoded = decodeURIComponent(escape(atob(val)));
+    var parsed = JSON.parse(decoded);
+    if (!parsed.tasks && !parsed.vocabProgress && !parsed.checkIns) { throw new Error('invalid'); }
+    var raw = localStorage.getItem('enTrainer_v3');
+    var data = raw ? JSON.parse(raw) : {tasks:{},vocabToday:{},vocabProgress:{},fetchedWords:[],semester:'7a',startDate:'2026-09-01',checkIns:{},checkInStreak:0,reminder:{time:'19:00',enabled:true},lastNotifyDate:null,listeningDone:{},mockScores:[],errorBook:[],clozeDone:{},clozeHistory:[],textbookRead:{}};
+    Object.keys(parsed).forEach(function(key) {
+      if (typeof data[key] === 'object' && data[key] !== null && !Array.isArray(data[key])) {
+        Object.keys(parsed[key]||{}).forEach(function(k) { data[key][k] = parsed[key][k]; });
+      } else if (Array.isArray(data[key])) {
+        (parsed[key]||[]).forEach(function(item) {
+          if (!data[key].some(function(x) { return JSON.stringify(x) === JSON.stringify(item); })) data[key].push(item);
+        });
+      } else {
+        if (data[key] === undefined || data[key] === 0 || data[key] === '') data[key] = parsed[key];
+        else if (typeof parsed[key] === 'number' && parsed[key] > (data[key]||0)) data[key] = parsed[key];
+      }
+    });
+    localStorage.setItem('enTrainer_v3', JSON.stringify(data));
+    document.getElementById('import-result').innerHTML = '<span style="color:green">✅ 导入成功！</span><br><a href="english.html" style="color:#3B82F6">点击前往七年级英语训练</a>';
+    showToast('数据导入成功！');
+  } catch(e) {
+    document.getElementById('import-result').innerHTML = '<span style="color:red">❌ 数据格式错误，请检查</span>';
+    showToast('导入失败，数据格式不对');
+  }
+}
+
+function importToGrade1() {
+  var val = document.getElementById('import-box-g1').value.trim();
+  if (!val) { showToast('请先粘贴数据'); return; }
+  try {
+    var decoded = decodeURIComponent(escape(atob(val)));
+    var parsed = JSON.parse(decoded);
+    if (typeof parsed !== 'object') { throw new Error('invalid'); }
+    var raw = localStorage.getItem('grade1_app_data');
+    var data = raw ? JSON.parse(raw) : {};
+    Object.keys(parsed).forEach(function(key) {
+      if (typeof data[key] === 'object' && data[key] !== null && !Array.isArray(data[key])) {
+        Object.keys(parsed[key]||{}).forEach(function(k) { data[key][k] = parsed[key][k]; });
+      } else if (Array.isArray(data[key])) {
+        (parsed[key]||[]).forEach(function(item) {
+          if (!data[key].some(function(x) { return JSON.stringify(x) === JSON.stringify(item); })) data[key].push(item);
+        });
+      } else {
+        if (data[key] === undefined || data[key] === 0 || data[key] === '') data[key] = parsed[key];
+        else if (typeof parsed[key] === 'number' && parsed[key] > (data[key]||0)) data[key] = parsed[key];
+      }
+    });
+    localStorage.setItem('grade1_app_data', JSON.stringify(data));
+    document.getElementById('import-result-g1').innerHTML = '<span style="color:green">✅ 导入成功！</span><br><a href="grade1.html" style="color:#3B82F6">点击前往一年级学习计划</a>';
+    showToast('数据导入成功！');
+  } catch(e) {
+    document.getElementById('import-result-g1').innerHTML = '<span style="color:red">❌ 数据格式错误，请检查</span>';
+    showToast('导入失败，数据格式不对');
+  }
+}
+</script>
+</body>
+</html>
