@@ -486,17 +486,36 @@ body { font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif; fon
     <div class="reminder-row"><label>开启提醒</label><div class="toggle-switch on" id="reminder-toggle" onclick="toggleReminder()"></div></div>
     <div class="reminder-row"><label>浏览器通知</label><button class="notify-btn" id="notify-btn" onclick="requestNotifyPermission()">开启通知</button></div>
   </div>
-  <div class="reminder-settings">
-    <h4>📦 数据迁移</h4>
-    <p style="font-size:0.78rem;color:var(--muted);margin-bottom:0.6rem">从旧站点（surge.sh）迁移打卡数据到当前站点</p>
-    <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
-      <button class="btn btn-speak" style="font-size:0.78rem;flex:1" onclick="exportData()">📤 导出数据</button>
-      <button class="btn btn-primary" style="font-size:0.78rem;flex:1" onclick="showImportBox()">📥 导入数据</button>
+  <div class="reminder-settings" id="data-migration">
+    <h4>📦 打卡数据迁移</h4>
+    <p style="font-size:0.78rem;color:var(--muted);margin-bottom:0.6rem">将旧站点（surge.sh）的打卡数据导入到当前站点</p>
+    <div id="migration-guide" style="display:none;background:#D1ECF9;border:1px solid #B8DAF3;border-radius:8px;padding:0.8rem;margin-bottom:0.6rem;font-size:0.78rem;color:#0C5464;line-height:1.8">
+      <div style="font-weight:bold;margin-bottom:0.4rem">📋 操作步骤：</div>
+      <div><b>第1步：</b>点击下方"打开旧站点"按钮（或在浏览器地址栏输入 <code style="background:#fff;padding:0 4px;border-radius:3px">grade1-english-apps.surge.sh/english.html</code>）</div>
+      <div><b>第2步：</b>页面打开后，在地址栏输入以下代码并前往：</div>
+      <div style="word-break:break-all;background:#fff;padding:0.4rem;border-radius:5px;margin:0.3rem 0;font-family:monospace;font-size:0.7rem;user-select:all;-webkit-user-select:all">javascript:void(prompt('复制数据',btoa(unescape(encodeURIComponent(localStorage.getItem('enTrainer_v3')||'{}')))))</div>
+      <div><b>第3步：</b>弹窗中长按全选→复制</div>
+      <div><b>第4步：</b>回到本页面，粘贴到下方输入框，点"确认导入"</div>
     </div>
-    <textarea id="import-box" placeholder="将旧站点导出的数据粘贴到这里..." style="display:none;width:100%;min-height:120px;margin-top:0.5rem;border:1px solid var(--rule);border-radius:8px;padding:0.5rem;font-size:0.75rem;font-family:monospace;resize:vertical"></textarea>
-    <div id="import-actions" style="display:none;gap:0.5rem;margin-top:0.5rem">
-      <button class="btn btn-primary" style="font-size:0.78rem;flex:1" onclick="doImport()">确认导入</button>
-      <button class="btn btn-speak" style="font-size:0.78rem;flex:1" onclick="document.getElementById('import-box').style.display='none';document.getElementById('import-actions').style.display='none'">取消</button>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.5rem">
+      <button class="btn btn-primary" style="font-size:0.78rem;flex:1" onclick="toggleMigrationGuide()">📥 从旧站点导入</button>
+      <button class="btn btn-speak" style="font-size:0.78rem;flex:1" onclick="exportData()">📤 导出本站数据</button>
+    </div>
+    <div id="old-site-actions" style="display:none">
+      <a href="https://grade1-english-apps.surge.sh/english.html" target="_blank" class="btn btn-green" style="font-size:0.78rem;display:block;text-align:center;text-decoration:none;margin-bottom:0.5rem">🔗 打开旧站点</a>
+      <textarea id="import-box" placeholder="将旧站点复制的数据粘贴到这里..." style="width:100%;min-height:100px;margin-top:0.3rem;border:1px solid var(--rule);border-radius:8px;padding:0.5rem;font-size:0.75rem;font-family:monospace;resize:vertical"></textarea>
+      <div style="display:flex;gap:0.5rem;margin-top:0.5rem">
+        <button class="btn btn-primary" style="font-size:0.78rem;flex:1" onclick="doImport()">✅ 确认导入</button>
+        <button class="btn btn-speak" style="font-size:0.78rem;flex:1" onclick="document.getElementById('old-site-actions').style.display='none';document.getElementById('import-box').value=''">取消</button>
+      </div>
+      <div id="import-result" style="font-size:0.78rem;margin-top:0.5rem"></div>
+    </div>
+    <div id="export-box" style="display:none">
+      <textarea id="export-area" readonly placeholder="导出的数据将显示在这里..." style="width:100%;min-height:100px;margin-top:0.3rem;border:1px solid var(--rule);border-radius:8px;padding:0.5rem;font-size:0.7rem;font-family:monospace;resize:vertical"></textarea>
+      <div style="display:flex;gap:0.5rem;margin-top:0.5rem">
+        <button class="btn btn-green" style="font-size:0.78rem;flex:1" onclick="copyExport()">📋 复制数据</button>
+        <button class="btn btn-speak" style="font-size:0.78rem;flex:1" onclick="document.getElementById('export-box').style.display='none'">关闭</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1875,70 +1894,73 @@ function switchSemester(sem) {
 }
 
 // ==================== DATA MIGRATION ====================
-function exportData() {
-  const raw = localStorage.getItem(STORE_KEY);
-  if (!raw) { showToast('暂无可导出的数据'); return; }
-  const encoded = btoa(unescape(encodeURIComponent(raw)));
-  const box = document.getElementById('import-box');
-  box.value = encoded;
-  box.style.display = 'block';
-  box.readOnly = true;
-  box.select();
-  document.execCommand('copy');
-  showToast('数据已导出并复制到剪贴板！请粘贴到新站点导入');
-  setTimeout(function(){ box.readOnly = false; }, 1000);
+function toggleMigrationGuide() {
+  var guide = document.getElementById('migration-guide');
+  var actions = document.getElementById('old-site-actions');
+  var exportBox = document.getElementById('export-box');
+  if (actions.style.display === 'none') {
+    guide.style.display = 'block';
+    actions.style.display = 'block';
+    exportBox.style.display = 'none';
+    showToast('请按步骤操作');
+  } else {
+    guide.style.display = 'none';
+    actions.style.display = 'none';
+  }
 }
-function showImportBox() {
-  const box = document.getElementById('import-box');
-  box.value = '';
-  box.readOnly = false;
-  box.style.display = 'block';
-  document.getElementById('import-actions').style.display = 'flex';
-  showToast('请粘贴旧站点导出的数据');
+function exportData() {
+  var raw = localStorage.getItem(STORE_KEY);
+  if (!raw || raw === '{}') { showToast('暂无可导出的数据'); return; }
+  var encoded = btoa(unescape(encodeURIComponent(raw)));
+  var exportBox = document.getElementById('export-box');
+  var area = document.getElementById('export-area');
+  area.value = encoded;
+  exportBox.style.display = 'block';
+  document.getElementById('migration-guide').style.display = 'none';
+  document.getElementById('old-site-actions').style.display = 'none';
+  area.select();
+  try { document.execCommand('copy'); showToast('数据已复制到剪贴板'); } catch(e) {}
+}
+function copyExport() {
+  var area = document.getElementById('export-area');
+  area.select();
+  try { document.execCommand('copy'); showToast('已复制到剪贴板'); } catch(e) { showToast('请长按手动复制'); }
 }
 function doImport() {
-  const box = document.getElementById('import-box');
-  const val = box.value.trim();
+  var box = document.getElementById('import-box');
+  var val = box.value.trim();
   if (!val) { showToast('请先粘贴数据'); return; }
   try {
-    const decoded = decodeURIComponent(escape(atob(val)));
-    const parsed = JSON.parse(decoded);
+    var decoded = decodeURIComponent(escape(atob(val)));
+    var parsed = JSON.parse(decoded);
     if (!parsed.tasks || typeof parsed.tasks !== 'object') { throw new Error('格式不对'); }
-    const oldData = loadData();
-    if (oldData.checkInStreak || Object.keys(oldData.tasks).length > 0) {
-      if (!confirm('当前已有数据，导入将合并（旧数据保留，新数据补充）。确认导入？')) return;
+    if (data.checkInStreak || Object.keys(data.tasks).length > 0) {
+      if (!confirm('当前已有数据，导入将合并（新旧数据取最大值）。确认导入？')) return;
     }
     Object.keys(parsed).forEach(function(key) {
-      if (key === 'vocabProgress' || key === 'tasks' || key === 'checkIns') {
+      if (key === 'vocabProgress' || key === 'tasks' || key === 'checkIns' || key === 'vocabToday' || key === 'listeningDone' || key === 'clozeDone' || key === 'textbookRead') {
         if (!data[key]) data[key] = {};
         Object.keys(parsed[key]).forEach(function(k) { data[key][k] = parsed[key][k]; });
       } else if (key === 'errorBook' || key === 'mockScores' || key === 'clozeHistory' || key === 'fetchedWords') {
         if (!Array.isArray(data[key])) data[key] = [];
         parsed[key].forEach(function(item) {
-          if (!data[key].some(function(x) { return JSON.stringify(x) === JSON.stringify(item); })) {
-            data[key].push(item);
-          }
+          if (!data[key].some(function(x) { return JSON.stringify(x) === JSON.stringify(item); })) data[key].push(item);
         });
-      } else if (key === 'vocabToday' || key === 'listeningDone' || key === 'clozeDone' || key === 'textbookRead') {
-        if (!data[key]) data[key] = {};
-        Object.keys(parsed[key]).forEach(function(k) { data[key][k] = parsed[key][k]; });
       } else {
-        if (data[key] === undefined || data[key] === null || data[key] === '' || (typeof data[key] === 'number' && data[key] === 0)) {
-          data[key] = parsed[key];
-        } else if (typeof parsed[key] === 'number' && parsed[key] > (data[key] || 0)) {
-          data[key] = parsed[key];
-        }
+        if (data[key] === undefined || data[key] === null || data[key] === '' || (typeof data[key] === 'number' && data[key] === 0)) data[key] = parsed[key];
+        else if (typeof parsed[key] === 'number' && parsed[key] > (data[key] || 0)) data[key] = parsed[key];
       }
     });
     saveData();
-    box.style.display = 'none';
-    document.getElementById('import-actions').style.display = 'none';
-    renderToday();
-    renderStats();
-    renderErrorBook();
+    box.value = '';
+    document.getElementById('old-site-actions').style.display = 'none';
+    document.getElementById('migration-guide').style.display = 'none';
+    document.getElementById('import-result').innerHTML = '<span style="color:var(--en-color)">✅ 导入成功！打卡数据已合并</span>';
+    renderToday(); renderStats(); renderErrorBook();
     showToast('数据导入成功！打卡记录已迁移');
   } catch(e) {
-    showToast('数据格式错误，请检查后重试');
+    document.getElementById('import-result').innerHTML = '<span style="color:#e74c3c">❌ 数据格式错误，请检查</span>';
+    showToast('导入失败，数据格式不对');
   }
 }
 
